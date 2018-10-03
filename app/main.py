@@ -1,7 +1,8 @@
 import cv2
 
 
-video_capture = cv2.VideoCapture('../animations/output/circle_blue_right.avi')
+video_capture = cv2.VideoCapture('../recordings/recording_circle_red_right.mov')
+# video_capture = cv2.VideoCapture('../animations/output/circle_blue_right.avi')
 
 if not video_capture.isOpened():
     print("Error opening video file")
