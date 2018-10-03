@@ -30,4 +30,4 @@ cd ShazamMovies
 
 * Install OpenCV for Python and dependencies e.g. numpy
 
-`pip install opencv-python`
+`pip install -r requirements.txt`
