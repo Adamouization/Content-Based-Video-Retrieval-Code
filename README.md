@@ -20,14 +20,14 @@ git clone https://github.com/Adamouization/ShazamMovies
 cd ShazamMovies
 ```
 
-* Create a new virtual environment
+* Create a new virtual environment with Python 3
 
-`virtualenv ~/Environments/ShazamVideo`
+`virtualenv -p python3 ~/Environments/ShazamMovies`
 
 * activate the virtual environment
 
-`source ~/Environments/ShazamVideo/bin/activate`
+`source ~/Environments/ShazamMovies/bin/activate`
 
-* Install OpenCV for Python and other libraries
+* Install OpenCV for Python and dependencies e.g. numpy
 
 `pip install opencv-python`
