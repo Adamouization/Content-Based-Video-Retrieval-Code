@@ -22,6 +22,6 @@ while video_capture.isOpened():
     else:
         break
 
-# tidying upq
+# tidying up
 video_capture.release()
 cv2.destroyAllWindows()
