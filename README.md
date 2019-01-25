@@ -1,32 +1,21 @@
-# ShazamMovies
+# Content-Based-Video-Retrieval-Code
 
-* Prerequesites to install
-  * Compiler
-  
-    `sudo apt-get install build-essential`
-
-  * Required
-  
-    `sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev`
-
-  * Optional
-  
-    `sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev`
+## Installation Guide
 
 * Clone the project
 ```
 cd ~/Projects
-git clone https://github.com/Adamouization/ShazamMovies
-cd ShazamMovies
+git clone https://github.com/Adamouization/Content-Based-Video-Retrieval-Code
+cd Content-Based-Video-Retrieval-Code
 ```
 
 * Create a new virtual environment with Python 3
 
-`virtualenv -p python3 ~/Environments/ShazamMovies`
+`virtualenv -p python3 ~/Environments/Content-Based-Video-Retrieval-Code`
 
 * activate the virtual environment
 
-`source ~/Environments/ShazamMovies/bin/activate`
+`source ~/Environments/Content-Based-Video-Retrieval-Code/bin/activate`
 
 * Install OpenCV for Python and dependencies e.g. numpy
 
