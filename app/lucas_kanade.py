@@ -1,8 +1,12 @@
 import numpy as np
 import cv2
 
-cap = cv2.VideoCapture('../recordings/recording_circle_red_left.mov')
+
+# cap = cv2.VideoCapture('../recordings/recording_circle_red_left.mov')
 # cap = cv2.VideoCapture('../animations/output/circle_red_left.avi')
+cap = cv2.VideoCapture('../footage/1-waves.mp4')
+
+frame_size = (1280, 720)
 
 # params for ShiTomasi corner detection, TODO improve tracking points
 feature_params = dict(maxCorners=100,
@@ -49,7 +53,8 @@ while cap.isOpened():
         frame = cv2.circle(frame, (a, b), 5, color[i].tolist(), -1)
     img = cv2.add(frame, mask)
 
-    cv2.imshow('frame', img)
+    resized_img = cv2.resize(img, frame_size, interpolation=cv2.INTER_AREA)
+    cv2.imshow('frame', resized_img)
 
     # user exit on "q" or "Esc" key press
     k = cv2.waitKey(30) & 0xFF

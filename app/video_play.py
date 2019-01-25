@@ -1,8 +1,10 @@
 import cv2
 
-
 # video_capture = cv2.VideoCapture('../recordings/recording_circle_red_right.mov')
-video_capture = cv2.VideoCapture('../animations/output/circle_red_left.avi')
+# video_capture = cv2.VideoCapture('../animations/output/circle_red_left.avi')
+video_capture = cv2.VideoCapture('../footage/1-waves.mp4')
+
+frame_size = (1280, 720)
 
 if not video_capture.isOpened():
     print("Error opening video file")
@@ -14,8 +16,9 @@ while video_capture.isOpened():
     ret, frame = video_capture.read()
 
     if ret:
-        # display current frame
-        cv2.imshow('Frame', frame)
+        # resize and display current frame
+        resized_frame = cv2.resize(frame, frame_size, interpolation=cv2.INTER_AREA)
+        cv2.imshow('Frame', resized_frame)
 
         # user exit on "q" or "Esc" key press
         k = cv2.waitKey(30) & 0xFF
