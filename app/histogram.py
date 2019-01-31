@@ -14,6 +14,7 @@ def generate_video_histogram(directory, file_name):
     }
     avg_histogram = np.zeros(shape=(255, 1))  # array to store average histogram values
 
+    # start capturing video
     video_capture = cv2.VideoCapture("{}{}".format(directory, file_name))
     if not video_capture.isOpened():
         print("Error opening video file")
