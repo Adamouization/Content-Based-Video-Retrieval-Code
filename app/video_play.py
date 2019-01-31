@@ -9,7 +9,11 @@ if not video_capture.isOpened():
 
 # print the number of frames in the video
 frame_count = video_capture.get(cv2.CAP_PROP_FRAME_COUNT)
-print(frame_count)
+print("frame count: {}".format(frame_count))
+
+# print the number of frames per second
+fps = video_capture.get(cv2.CAP_PROP_FPS)
+print("fps: {}".format(fps))
 
 # read video until completion or user exit
 while video_capture.isOpened():

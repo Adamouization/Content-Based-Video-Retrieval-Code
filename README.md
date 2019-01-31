@@ -20,3 +20,9 @@ cd Content-Based-Video-Retrieval-Code
 * Install OpenCV for Python and dependencies e.g. numpy
 
 `pip install -r requirements.txt`
+
+
+## TODO Project Boards
+
+* [Project Presentation](https://github.com/Adamouization/Content-Based-Video-Retrieval-Code/projects/1) (18/02/2019)
+* [Project Enhancements](https://github.com/Adamouization/Content-Based-Video-Retrieval-Code/projects/2) (07/05/2019)
