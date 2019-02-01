@@ -4,11 +4,22 @@ from app.histogram import generate_video_histogram
 
 
 def main():
+    train_hist_classifier()
+    test_hist_classifier()
+
+
+def train_hist_classifier():
     directory = "../footage/"
+
     for file in get_video_filenames(directory):
         print("generating histogram for {}".format(file))
         generate_video_histogram(directory, file)
     print("Generated histograms for all files in directory {}".format(directory))
+
+
+def test_hist_classifier():
+    directory = "../recordings/"
+    # todo - test histogram classifier with sample recordings
 
 
 def get_video_filenames(directory):
