@@ -7,7 +7,7 @@ from app.histogram import generate_video_histogram
 
 
 def main():
-    train_hist_classifier()
+    # train_hist_classifier()
     test_hist_classifier()
 
 
@@ -23,6 +23,9 @@ def train_hist_classifier():
 def test_hist_classifier():
     # get histogram for the recorded video to match - todo: calculate the histogram on the go
     directory = "../recordings/"
+    video_match = ""
+    video_match_value = 0
+
     histcmp_methods = [cv2.HISTCMP_CORREL, cv2.HISTCMP_CHISQR, cv2.HISTCMP_INTERSECT, cv2.HISTCMP_BHATTACHARYYA]
     hist_recording = {
         'b': np.loadtxt('../histogram_data/recording.mp4/hist-b', dtype=np.float32, unpack=False),
@@ -34,14 +37,14 @@ def test_hist_classifier():
     for m in histcmp_methods:
         print("------------------------------------")
         if m == 0:
-            print("CORRELATION (highest)")
+            print("CORRELATION")
         elif m == 1:
-            print("INTERSECTION (highest)")
+            print("INTERSECTION")
         elif m == 2:
-            print("CHI SQUARE (lowest)")
+            print("CHI SQUARE")
         else:
-            print("BHATTACHARYYA (lowest)")
-        for file in get_video_filenames("../footage/"):
+            print("BHATTACHARYYA")
+        for i, file in enumerate(get_video_filenames("../footage/")):
             hist_b = np.loadtxt('../histogram_data/{}/hist-b'.format(file), dtype=np.float32, unpack=False)
             hist_g = np.loadtxt('../histogram_data/{}/hist-g'.format(file), dtype=np.float32, unpack=False)
             hist_r = np.loadtxt('../histogram_data/{}/hist-r'.format(file), dtype=np.float32, unpack=False)
@@ -50,6 +53,17 @@ def test_hist_classifier():
             comparison_r = cv2.compareHist(hist_recording['r'], hist_r, m)
             comparison = (comparison_b + comparison_g + comparison_r) / 3
             print("comparison with {} = {}".format(file, comparison))
+            if i == 0:
+                video_match = file
+                video_match_value = comparison
+            else:
+                if m in [0, 1] and comparison > video_match_value:
+                    video_match = file
+                    video_match_value = comparison
+                elif m in [2, 3] and comparison < video_match_value:
+                    video_match = file
+                    video_match_value = comparison
+        print("Match found: {}".format(video_match))
 
 
 def get_video_filenames(directory):
