@@ -1,4 +1,5 @@
 import math
+import os
 
 import cv2
 from matplotlib import pyplot as plt
@@ -61,7 +62,9 @@ def generate_video_histogram(directory, file_name):
             new_bin_value = bin_sum / len(hists)
             avg_histogram[i] = new_bin_value
 
-        np.savetxt('../histogram_data/{}-avg-histogram-{}'.format(file_name, col), avg_histogram, fmt='%d')
+        if not os.path.exists("../histogram_data/{}/".format(file_name)):
+            os.makedirs("../histogram_data/{}/".format(file_name))
+        np.savetxt("../histogram_data/{}/hist-{}".format(file_name, col), avg_histogram, fmt='%d')
         plt.plot(avg_histogram, color=col)
         plt.xlim([0, 256])
     plt.show()
