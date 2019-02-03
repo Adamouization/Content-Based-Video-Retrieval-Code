@@ -34,6 +34,7 @@ def generate_video_histogram(directory, file_name):
             if frame_counter in frames_to_process:
                 for i, col in enumerate(colours):
                     histogram = cv2.calcHist([frame], [i], None, [256], [0, 256])
+                    histogram = cv2.normalize(histogram, histogram)
                     histograms_dict[col].append(histogram)
                     # debugging:
                     # print("i: {}, col: {}".format(i, col))
@@ -64,7 +65,7 @@ def generate_video_histogram(directory, file_name):
 
         if not os.path.exists("../histogram_data/{}/".format(file_name)):
             os.makedirs("../histogram_data/{}/".format(file_name))
-        np.savetxt("../histogram_data/{}/hist-{}".format(file_name, col), avg_histogram, fmt='%d')
+        np.savetxt("../histogram_data/{}/hist-{}".format(file_name, col), avg_histogram, fmt='%f')
         plt.plot(avg_histogram, color=col)
         plt.xlim([0, 256])
     plt.show()
