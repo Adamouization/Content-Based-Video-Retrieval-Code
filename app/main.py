@@ -7,11 +7,15 @@ from app.histogram import generate_video_histogram
 
 
 def main():
-    # train_hist_classifier()
+    train_hist_classifier()
     test_hist_classifier()
 
 
 def train_hist_classifier():
+    """
+    Generates an averaged BGR histogram for all the videos in the directory-based database.
+    :return: None
+    """
     directory = "../footage/"
 
     for file in get_video_filenames(directory):
@@ -21,12 +25,18 @@ def train_hist_classifier():
 
 
 def test_hist_classifier():
-    # get histogram for the recorded video to match - todo: calculate the histogram on the go
+    """
+    Compares the BGR histogram of a mobile-recorded video (of one of the DB videos) and compares it with each of the
+    videos' saved BGR histograms using different histogram matching methods such as the Chi-Square or Bhattacharyya
+    methods, and prints the results as probabilities.
+    :return: None
+    """
     directory = "../recordings/"
     video_match = ""
     video_match_value = 0
-
     histcmp_methods = [cv2.HISTCMP_CORREL, cv2.HISTCMP_CHISQR, cv2.HISTCMP_INTERSECT, cv2.HISTCMP_BHATTACHARYYA]
+
+    # get histogram for the recorded video to match - todo: calculate the histogram on the go
     hist_recording = {
         'b': np.loadtxt('../histogram_data/recording.mp4/hist-b', dtype=np.float32, unpack=False),
         'g': np.loadtxt('../histogram_data/recording.mp4/hist-g', dtype=np.float32, unpack=False),
@@ -67,6 +77,11 @@ def test_hist_classifier():
 
 
 def get_video_filenames(directory):
+    """
+    Returns a list containing all the mp4 files in a directory
+    :param directory: the directory containing mp4 files
+    :return: list of strings
+    """
     list_of_videos = list()
     for filename in os.listdir(directory):
         if filename.endswith(".mp4"):

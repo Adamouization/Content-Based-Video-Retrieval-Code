@@ -6,27 +6,32 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 
-def generate_video_histogram(directory, file_name):
-    colours = ('b', 'g', 'r')
-    histograms_dict = {
-        'b': list(),
-        'g': list(),
-        'r': list()
-    }
-    avg_histogram = np.zeros(shape=(255, 1))  # array to store average histogram values
+colours = ('b', 'g', 'r')
 
+
+def generate_video_histogram(directory, file_name):
+    """
+    Creates a VideoCapture object for a mp4 file and generates an averaged and normalized BGR histogram for the video
+    before writing the results to a txt file.
+    :param directory: the directory where the video file is located
+    :param file_name: the mp4 video file's name
+    :return: None
+    """
     # start capturing video
     video_capture = cv2.VideoCapture("{}{}".format(directory, file_name))
     if not video_capture.isOpened():
         print("Error opening video file")
 
     # determine which frames to process for histograms
-    total_frames = video_capture.get(cv2.CAP_PROP_FRAME_COUNT)
-    fps = video_capture.get(cv2.CAP_PROP_FPS)
-    frames_to_process = _get_frames_to_process(total_frames, fps)
+    frames_to_process = _get_frames_to_process(video_capture)
 
     # read the video and store the histograms for each frame per color channel in a dict
-    frame_counter = 0
+    histograms_dict = {
+        'b': list(),
+        'g': list(),
+        'r': list()
+    }
+    frame_counter = 0  # keep track of current frame ID to know to process it or not
     while video_capture.isOpened():
         ret, frame = video_capture.read()  # read capture frame by frame
         if ret:
@@ -50,6 +55,7 @@ def generate_video_histogram(directory, file_name):
             break
 
     # generate a single histogram by averaging all histograms of a video
+    avg_histogram = np.zeros(shape=(255, 1))  # array to store average histogram values
     for col, hists in histograms_dict.items():
         for i in range(0, 255):  # loop through all bins
             bin_sum = 0
@@ -75,8 +81,15 @@ def generate_video_histogram(directory, file_name):
     cv2.destroyAllWindows()
 
 
-def _get_frames_to_process(total_frames, fps):
+def _get_frames_to_process(video_capture):
+    """
+    Returns the IDs of the frames to calculate a BGR histogram for.
+    :param video_capture: the VideoCapture object to process
+    :return: a list of integers representing the frames to process
+    """
     frame_ids = list()
+    total_frames = video_capture.get(cv2.CAP_PROP_FRAME_COUNT)
+    fps = video_capture.get(cv2.CAP_PROP_FPS)
     for i in range(1, int(total_frames) + 1, math.ceil(fps)):
         frame_ids.append(i)
     return frame_ids
