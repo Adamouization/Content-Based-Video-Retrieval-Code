@@ -74,6 +74,7 @@ def generate_video_histogram(directory, file_name):
         np.savetxt("../histogram_data/{}/hist-{}".format(file_name, col), avg_histogram, fmt='%f')
         plt.plot(avg_histogram, color=col)
         plt.xlim([0, 256])
+    plt.title('{}'.format(file_name))
     plt.show()
 
     # tidying up OpenCV video environment
