@@ -3,7 +3,7 @@ import os
 import cv2
 import numpy as np
 
-from app.histogram import generate_video_histogram
+from app.histogram import HistogramGenerator
 
 
 def main():
@@ -20,7 +20,8 @@ def train_hist_classifier():
 
     for file in get_video_filenames(directory):
         print("generating histogram for {}".format(file))
-        generate_video_histogram(directory, file)
+        histogram_generator = HistogramGenerator(directory, file)
+        histogram_generator.generate_and_store_video_histogram()
     print("Generated histograms for all files in directory {}".format(directory))
 
 
@@ -32,6 +33,11 @@ def test_hist_classifier():
     :return: None
     """
     directory = "../recordings/"
+    file = "recording.mp4"
+
+    histogram_generator = HistogramGenerator(directory, file)
+    histogram_generator.generate_and_store_recording_video_histogram()
+
     video_match = ""
     video_match_value = 0
     histcmp_methods = [cv2.HISTCMP_CORREL, cv2.HISTCMP_CHISQR, cv2.HISTCMP_INTERSECT, cv2.HISTCMP_BHATTACHARYYA]
