@@ -90,21 +90,25 @@ class HistogramGenerator:
         # determine which frames to process for histograms
         frames_to_process = _get_frames_to_process(self.video_capture)
 
+        refpt = list()
         frame_counter = 0  # keep track of current frame ID to know to process it or not
         while self.video_capture.isOpened():
             ret, frame = self.video_capture.read()  # read capture frame by frame
             if ret:
                 if frame_counter == 0:
                     cad = ClickAndDrop(frame)
-                    # roi = cad.get_roi()
-                    # cv2.imshow('Selected ROI', roi)
-                    # cv2.waitKey(0)
+                    roi = cad.get_roi()
+                    cv2.imshow('Selected ROI', roi)
+                    cv2.waitKey(0)
                     # todo use these reference points to ignore pixels outside when generating histogram
                     refpt = cad.get_refpt()
                 frame_counter += 1
                 if frame_counter in frames_to_process:
                     for i, col in enumerate(self.colours):
-                        histogram = cv2.calcHist([frame], [i], None, [256], [0, 256])
+                        print("[({},{}),({},{})]".format(refpt[0][1], refpt[1][1], refpt[0][0], refpt[1][0]))
+                        print(frame[refpt[0][1]:refpt[1][1], refpt[0][0]:refpt[1][0]])
+                        roi = frame[refpt[0][1]:refpt[1][1], refpt[0][0]:refpt[1][0]]
+                        histogram = cv2.calcHist([roi], [i], None, [256], [0, 256])
                         histogram = cv2.normalize(histogram, histogram)
                         self.histograms_dict[col].append(histogram)
                         # debugging:
@@ -119,6 +123,29 @@ class HistogramGenerator:
                         break
             else:
                 break
+
+        # generate a single histogram by averaging all histograms of a video
+        for col, hists in self.histograms_dict.items():
+            for i in range(0, 255):  # loop through all bins
+                bin_sum = 0
+
+                # get value for each colour histogram in bin i
+                for arr_index in range(0, len(hists)):
+                    bin_value = hists[arr_index].item(i)
+                    bin_sum += bin_value
+
+                # average all bins values to store in new histogram
+                new_bin_value = bin_sum / len(hists)
+                self.avg_histogram[i] = new_bin_value
+
+            if not os.path.exists("../histogram_data/{}/".format(self.file_name)):
+                os.makedirs("../histogram_data/{}/".format(self.file_name))
+            np.savetxt("../histogram_data/{}/hist-{}".format(self.file_name, col), self.avg_histogram, fmt='%f')
+            plt.plot(self.avg_histogram, color=col)
+            plt.xlim([0, 256])
+        plt.title('{}'.format(self.file_name))
+        plt.show()
+        self.destroy_video_capture()
 
     def check_video_capture(self):
         """
@@ -179,7 +206,7 @@ class ClickAndDrop:
                 break
 
         # if there are two reference points, then crop the region of interest
-        # from teh image and display it
+        # from the image and display it
         if len(self.refPt) == 2:
             self.roi = clone[self.refPt[0][1]:self.refPt[1][1], self.refPt[0][0]:self.refPt[1][0]]
             # cv2.imshow("ROI", self.roi)

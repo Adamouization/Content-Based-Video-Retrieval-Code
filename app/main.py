@@ -7,7 +7,7 @@ from app.histogram import HistogramGenerator
 
 
 def main():
-    train_hist_classifier()
+    # train_hist_classifier()
     test_hist_classifier()
 
 
