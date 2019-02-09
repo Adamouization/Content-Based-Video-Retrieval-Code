@@ -1,18 +1,26 @@
 import numpy as np
 import cv2
 
+from vidstab import VidStab
 
-# cap = cv2.VideoCapture('../recordings/recording_circle_red_left.mov')
-# cap = cv2.VideoCapture('../animations/output/circle_red_left.avi')
-cap = cv2.VideoCapture('../footage/1-waves.mp4')
 
 frame_size = (1280, 720)
 
+# stabilize video
+print("Stabilizing video...")
+stabilizer = VidStab()
+stabilizer.stabilize(input_path="../recordings/recording.mp4",
+                     output_path="../recordings/stable-recording.avi",
+                     border_type="reflect")
+print("Video stabilized!")
+
+cap = cv2.VideoCapture('../recordings/stable-recording.avi')
+
 # params for ShiTomasi corner detection, TODO improve tracking points
-feature_params = dict(maxCorners=100,
+feature_params = dict(maxCorners=10,
                       qualityLevel=0.3,
-                      minDistance=7,
-                      blockSize=7)
+                      minDistance=25,
+                      blockSize=25)
 
 # Parameters for lucas kanade optical flow
 lk_params = dict(winSize=(15, 15),
