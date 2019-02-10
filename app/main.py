@@ -7,7 +7,7 @@ from app.histogram import HistogramGenerator
 
 
 def main():
-    # train_hist_classifier()
+    train_hist_classifier()
     test_hist_classifier()
 
 
@@ -21,7 +21,7 @@ def train_hist_classifier():
     for file in get_video_filenames(directory):
         print("generating histogram for {}".format(file))
         histogram_generator = HistogramGenerator(directory, file)
-        histogram_generator.generate_and_store_video_histogram()
+        histogram_generator.generate_video_histograms()
     print("Generated histograms for all files in directory {}".format(directory))
 
 
@@ -35,9 +35,12 @@ def test_hist_classifier():
     directory = "../recordings/"
     file = "recording.mp4"
 
+    # calculate histogram for the recorded video
+    print("Please crop the recorded video for the histogram to be generated.")
     histogram_generator = HistogramGenerator(directory, file)
-    histogram_generator.generate_and_store_recording_video_histogram()
+    histogram_generator.generate_recording_video_histograms()
 
+    # variables used for finding the match to the recorded video
     video_match = ""
     video_match_value = 0
     histcmp_methods = [cv2.HISTCMP_CORREL, cv2.HISTCMP_CHISQR, cv2.HISTCMP_INTERSECT, cv2.HISTCMP_BHATTACHARYYA]
@@ -50,6 +53,7 @@ def test_hist_classifier():
     }
 
     # compare recorded video histogram with histogram of each video
+    print("Histogram Comparison Results:")
     for m in histcmp_methods:
         print("------------------------------------")
         if m == 0:
