@@ -7,6 +7,10 @@ from app.histogram import HistogramGenerator
 
 
 def main():
+    """
+    Program entry point.
+    :return: None
+    """
     train_hist_classifier()
     test_hist_classifier()
 

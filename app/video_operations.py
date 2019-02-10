@@ -11,6 +11,11 @@ class ClickAndDrop:
     window_name = "Crop the recording (top-left click -> bottom-right drop) - 'C' to crop - 'R' to restart"
 
     def __init__(self, thumbnail):
+        """
+        Loads the image to crop and controls the callback loop. Calculates the reference points once a valid cropped
+        area has been chosen and the user has clicked "c".
+        :param thumbnail: the first frame of the video to crop
+        """
         self.thumbnail = thumbnail
 
         self.reference_points = list()
@@ -82,7 +87,7 @@ class ClickAndDrop:
     def get_reference_points(self):
         """
         Returns the ROI's reference points coordinates
-        :return:
+        :return: reference_points: a list containing the two x and y coordinates used to crop the image.
         """
         return self.reference_points
 
@@ -92,12 +97,22 @@ class VideoStabilizer:
     Class used to stabilize the recorded video for more optimal matching.
     """
     def __init__(self, directory, file_name):
+        """
+        Initialise variables and call the function to stabilize the specified video.
+        :param directory: the directory where the video file to stabilize is located
+        :param file_name: the mp4 video file's name
+        """
         self.directory = directory
         self.file = file_name
+
         self.stabilizer = VidStab()
         self.stabilize_video()
 
     def stabilize_video(self):
+        """
+        Stabilizes a mp4 video and outputs the result as an avi file in the same directory.
+        :return:
+        """
         print("Stabilizing video...")
         self.stabilizer.stabilize(input_path="{}/{}".format(self.directory, self.file),
                                   output_path="{}/stable-recording.avi".format(self.directory),

@@ -13,7 +13,7 @@ class HistogramGenerator:
 
     def __init__(self, directory, file_name):
         """
-        Initialise variables and create a VideoCapture object for a mp4 file
+        Initialise variables and create a VideoCapture object for a mp4 file.
         :param directory: the directory where the video file is located
         :param file_name: the mp4 video file's name
         """
@@ -33,7 +33,7 @@ class HistogramGenerator:
 
     def generate_video_histograms(self):
         """
-        Generates multiple BGR histograms (one every second) for the video.
+        Generates multiple BGR histograms (one every second) for a DB video.
         :return: None
         """
         # determine which frames to process for histograms
@@ -66,7 +66,8 @@ class HistogramGenerator:
 
     def generate_recording_video_histograms(self):
         """
-
+        Generates multiple BGR histograms (one every second) for the recorded video to match.
+        Allows the user to crop the video using the first frame as a thumbnail.
         :return:
         """
         # determine which frames to process for histograms
