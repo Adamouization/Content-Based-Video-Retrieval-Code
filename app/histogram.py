@@ -5,11 +5,13 @@ import cv2
 from matplotlib import pyplot as plt
 import numpy as np
 
+from app.helpers import get_video_filenames
 from app.video_operations import ClickAndDrop
 
 
 class HistogramGenerator:
     colours = ('b', 'g', 'r')
+    histcmp_methods = [cv2.HISTCMP_CORREL, cv2.HISTCMP_CHISQR, cv2.HISTCMP_INTERSECT, cv2.HISTCMP_BHATTACHARYYA]
 
     def __init__(self, directory, file_name):
         """
@@ -33,7 +35,7 @@ class HistogramGenerator:
 
     def generate_video_histograms(self):
         """
-        Generates multiple BGR histograms (one every second) for a DB video.
+        Generates multiple normalized BGR histograms (one every second) for a DB video.
         :return: None
         """
         # determine which frames to process for histograms
@@ -66,7 +68,7 @@ class HistogramGenerator:
 
     def generate_recording_video_histograms(self):
         """
-        Generates multiple BGR histograms (one every second) for the recorded video to match.
+        Generates multiple normalized BGR histograms (one every second) for the recorded video to match.
         Allows the user to crop the video using the first frame as a thumbnail.
         :return:
         """
@@ -139,6 +141,57 @@ class HistogramGenerator:
             plt.xlim([0, 256])
         plt.title('{}'.format(self.file_name))
         plt.show()
+
+    def match_histograms(self):
+        """
+        Compares the BGR histogram of the recorded video and compares it with each of the saved average BGR histograms
+        using different histogram matching methods such as the Chi-Square or Bhattacharyya methods, and prints the
+        results as probabilities.
+        :return: None
+        """
+        # variables used for finding the match to the recorded video
+        video_match = ""
+        video_match_value = 0
+
+        # get histogram for the recorded video to match - todo: calculate the histogram on the go
+        hist_recording = {
+            'b': np.loadtxt('../histogram_data/recording.mp4/hist-b', dtype=np.float32, unpack=False),
+            'g': np.loadtxt('../histogram_data/recording.mp4/hist-g', dtype=np.float32, unpack=False),
+            'r': np.loadtxt('../histogram_data/recording.mp4/hist-r', dtype=np.float32, unpack=False)
+        }
+
+        # compare recorded video histogram with histogram of each video
+        print("Histogram Comparison Results:")
+        for m in self.histcmp_methods:
+            print("------------------------------------")
+            if m == 0:
+                print("CORRELATION")
+            elif m == 1:
+                print("INTERSECTION")
+            elif m == 2:
+                print("CHI SQUARE")
+            else:
+                print("BHATTACHARYYA")
+            for i, file in enumerate(get_video_filenames("../footage/")):
+                hist_b = np.loadtxt('../histogram_data/{}/hist-b'.format(file), dtype=np.float32, unpack=False)
+                hist_g = np.loadtxt('../histogram_data/{}/hist-g'.format(file), dtype=np.float32, unpack=False)
+                hist_r = np.loadtxt('../histogram_data/{}/hist-r'.format(file), dtype=np.float32, unpack=False)
+                comparison_b = cv2.compareHist(hist_recording['b'], hist_b, m)
+                comparison_g = cv2.compareHist(hist_recording['g'], hist_g, m)
+                comparison_r = cv2.compareHist(hist_recording['r'], hist_r, m)
+                comparison = (comparison_b + comparison_g + comparison_r) / 3
+                print("comparison with {} = {}".format(file, comparison))
+                if i == 0:
+                    video_match = file
+                    video_match_value = comparison
+                else:
+                    if m in [0, 2] and comparison > video_match_value:
+                        video_match = file
+                        video_match_value = comparison
+                    elif m in [1, 3] and comparison < video_match_value:
+                        video_match = file
+                        video_match_value = comparison
+            print("Match found: {}".format(video_match))
 
     def check_video_capture(self):
         """
