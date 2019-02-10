@@ -1,18 +1,13 @@
 import numpy as np
 import cv2
 
-from vidstab import VidStab
+from app.video_operations import VideoStabilizer
 
 
 frame_size = (1280, 720)
 
 # stabilize video
-print("Stabilizing video...")
-stabilizer = VidStab()
-stabilizer.stabilize(input_path="../recordings/recording.mp4",
-                     output_path="../recordings/stable-recording.avi",
-                     border_type="reflect")
-print("Video stabilized!")
+VideoStabilizer("../recordings", "recording.mp4")
 
 cap = cv2.VideoCapture('../recordings/stable-recording.avi')
 

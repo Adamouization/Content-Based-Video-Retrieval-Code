@@ -1,4 +1,5 @@
 import cv2
+from vidstab import VidStab
 
 
 class ClickAndDrop:
@@ -84,3 +85,21 @@ class ClickAndDrop:
         :return:
         """
         return self.reference_points
+
+
+class VideoStabilizer:
+    """
+    Class used to stabilize the recorded video for more optimal matching.
+    """
+    def __init__(self, directory, file_name):
+        self.directory = directory
+        self.file = file_name
+        self.stabilizer = VidStab()
+        self.stabilize_video()
+
+    def stabilize_video(self):
+        print("Stabilizing video...")
+        self.stabilizer.stabilize(input_path="{}/{}".format(self.directory, self.file),
+                                  output_path="{}/stable-recording.avi".format(self.directory),
+                                  border_type="reflect")
+        print("Video stabilized!")
