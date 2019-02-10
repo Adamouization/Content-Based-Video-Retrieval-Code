@@ -97,10 +97,9 @@ class HistogramGenerator:
             if ret:
                 if frame_counter == 0:
                     cad = ClickAndDrop(frame)
-                    roi = cad.get_roi()
-                    cv2.imshow('Selected ROI', roi)
-                    cv2.waitKey(0)
-                    # todo use these reference points to ignore pixels outside when generating histogram
+                    # roi_frame = cad.get_roi()
+                    # cv2.imshow('Selected ROI', roi_frame)
+                    # cv2.waitKey(0)
                     refpt = cad.get_refpt()
                 frame_counter += 1
                 if frame_counter in frames_to_process:
@@ -185,8 +184,7 @@ class ClickAndDrop:
         self.cropping = False
 
         # load the image, clone it, and setup the mouse callback function
-        self.image = cv2.imread("/Users/ajaamour/Projects/Content-Based-Video-Retrieval-Code/recordings/test.png")
-        self.image = cv2.resize(self.image, self.frame_size, interpolation=cv2.INTER_AREA)
+        self.image = cv2.resize(self.thumbnail, self.frame_size, interpolation=cv2.INTER_AREA)
         clone = self.image.copy()
         cv2.namedWindow("image")
         cv2.setMouseCallback("image", self.click_and_crop)
@@ -219,6 +217,8 @@ class ClickAndDrop:
         """
         Callback function allowing a user to manually crop an image.
 
+        NOTE: must crop from top-left corner to bottom-right corner
+
         Function written by Adrian Rosebrock
         Link: https://www.pyimagesearch.com/2015/03/09/capturing-mouse-click-events-with-python-and-opencv/
 
@@ -229,20 +229,15 @@ class ClickAndDrop:
         :param param: optional parameters
         :return: None
         """
-        # grab references to the global variables
-        # global refPt, cropping
-
-        # if the left mouse button was clicked, record the starting
-        # (x, y) coordinates and indicate that cropping is being
-        # performed
+        # if the left mouse button was clicked, record the starting (x, y) coordinates and indicate that cropping is
+        # being performed
         if event == cv2.EVENT_LBUTTONDOWN:
             self.refPt = [(x, y)]
             self.cropping = True
 
         # check to see if the left mouse button was released
         elif event == cv2.EVENT_LBUTTONUP:
-            # record the ending (x, y) coordinates and indicate that
-            # the cropping operation is finished
+            # record the ending (x, y) coordinates and indicate that the cropping operation is finished
             self.refPt.append((x, y))
             self.cropping = False
 

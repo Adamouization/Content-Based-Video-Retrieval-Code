@@ -73,10 +73,10 @@ def test_hist_classifier():
                 video_match = file
                 video_match_value = comparison
             else:
-                if m in [0, 1] and comparison > video_match_value:
+                if m in [0, 2] and comparison > video_match_value:
                     video_match = file
                     video_match_value = comparison
-                elif m in [2, 3] and comparison < video_match_value:
+                elif m in [1, 3] and comparison < video_match_value:
                     video_match = file
                     video_match_value = comparison
         print("Match found: {}".format(video_match))
