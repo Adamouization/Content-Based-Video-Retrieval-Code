@@ -1,13 +1,13 @@
 import numpy as np
 import cv2
 
-from app.video_operations import VideoStabilizer
+from app.video_operations import ClickAndDrop, VideoStabilizer
 
 
 frame_size = (1280, 720)
 
 # stabilize video
-VideoStabilizer("../recordings", "recording.mp4")
+VideoStabilizer("../recordings", "recording1.mp4")
 
 cap = cv2.VideoCapture('../recordings/stable-recording.avi')
 
@@ -27,6 +27,11 @@ color = np.random.randint(0, 255, (100, 3))
 
 # Take first frame and find corners in it
 ret, old_frame = cap.read()
+
+cad = ClickAndDrop(old_frame)
+reference_points = cad.get_reference_points()
+old_frame = old_frame[reference_points[0][1]:reference_points[1][1], reference_points[0][0]:reference_points[1][0]]
+
 old_gray = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
 p0 = cv2.goodFeaturesToTrack(old_gray, mask=None, **feature_params)
 
@@ -39,6 +44,7 @@ while cap.isOpened():
     if frame is None:  # break loop at the end of the clip
         break
 
+    frame = frame[reference_points[0][1]:reference_points[1][1], reference_points[0][0]:reference_points[1][0]]
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     # calculate optical flow
