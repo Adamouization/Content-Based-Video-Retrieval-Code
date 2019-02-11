@@ -9,7 +9,7 @@ frame_size = (1280, 720)
 # stabilize video
 VideoStabilizer("../recordings", "recording1.mp4")
 
-cap = cv2.VideoCapture('../recordings/stable-recording.avi')
+cap = cv2.VideoCapture("../recordings/stable-recording.avi")
 
 # params for ShiTomasi corner detection, TODO improve tracking points
 feature_params = dict(maxCorners=10,
@@ -63,7 +63,7 @@ while cap.isOpened():
     img = cv2.add(frame, mask)
 
     resized_img = cv2.resize(img, frame_size, interpolation=cv2.INTER_AREA)
-    cv2.imshow('frame', resized_img)
+    cv2.imshow("frame", resized_img)
 
     # user exit on "q" or "Esc" key press
     k = cv2.waitKey(30) & 0xFF

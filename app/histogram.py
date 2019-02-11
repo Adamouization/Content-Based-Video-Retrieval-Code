@@ -156,9 +156,9 @@ class HistogramGenerator:
 
         # get histogram for the recorded video to match - todo: calculate the histogram on the go
         hist_recording = {
-            'b': np.loadtxt('../histogram_data/{}/hist-b'.format(self.file_name), dtype=np.float32, unpack=False),
-            'g': np.loadtxt('../histogram_data/{}/hist-g'.format(self.file_name), dtype=np.float32, unpack=False),
-            'r': np.loadtxt('../histogram_data/{}/hist-r'.format(self.file_name), dtype=np.float32, unpack=False)
+            'b': np.loadtxt("../histogram_data/{}/hist-b".format(self.file_name), dtype=np.float32, unpack=False),
+            'g': np.loadtxt("../histogram_data/{}/hist-g".format(self.file_name), dtype=np.float32, unpack=False),
+            'r': np.loadtxt("../histogram_data/{}/hist-r".format(self.file_name), dtype=np.float32, unpack=False)
         }
 
         # compare recorded video histogram with histogram of each video
@@ -176,9 +176,9 @@ class HistogramGenerator:
 
             table_data = list()
             for i, file in enumerate(get_video_filenames("../footage/")):
-                hist_b = np.loadtxt('../histogram_data/{}/hist-b'.format(file), dtype=np.float32, unpack=False)
-                hist_g = np.loadtxt('../histogram_data/{}/hist-g'.format(file), dtype=np.float32, unpack=False)
-                hist_r = np.loadtxt('../histogram_data/{}/hist-r'.format(file), dtype=np.float32, unpack=False)
+                hist_b = np.loadtxt("../histogram_data/{}/hist-b".format(file), dtype=np.float32, unpack=False)
+                hist_g = np.loadtxt("../histogram_data/{}/hist-g".format(file), dtype=np.float32, unpack=False)
+                hist_r = np.loadtxt("../histogram_data/{}/hist-r".format(file), dtype=np.float32, unpack=False)
                 comparison_b = cv2.compareHist(hist_recording['b'], hist_b, m)
                 comparison_g = cv2.compareHist(hist_recording['g'], hist_g, m)
                 comparison_r = cv2.compareHist(hist_recording['r'], hist_r, m)
