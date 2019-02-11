@@ -23,7 +23,7 @@ def train_hist_classifier():
         print("generating histogram for {}".format(file))
         histogram_generator = HistogramGenerator(directory, file)
         histogram_generator.generate_video_histograms()
-    print("Generated histograms for all files in directory {}".format(directory))
+    print("\nGenerated histograms for all files in directory {}".format(directory))
 
 
 def test_hist_classifier():
@@ -36,7 +36,7 @@ def test_hist_classifier():
     file = "recording.mp4"
 
     # calculate histogram for the recorded video
-    print("Please crop the recorded video for the histogram to be generated.")
+    print("\nPlease crop the recorded video for the histogram to be generated.")
     histogram_generator = HistogramGenerator(directory, file)
     histogram_generator.generate_recording_video_histograms()
     histogram_generator.match_histograms()

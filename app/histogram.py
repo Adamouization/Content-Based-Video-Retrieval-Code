@@ -4,6 +4,7 @@ import os
 import cv2
 from matplotlib import pyplot as plt
 import numpy as np
+from terminaltables import DoubleTable
 
 from app.helpers import get_video_filenames
 from app.video_operations import ClickAndDrop
@@ -161,17 +162,19 @@ class HistogramGenerator:
         }
 
         # compare recorded video histogram with histogram of each video
-        print("Histogram Comparison Results:")
+        print("\nHistogram Comparison Results:\n")
         for m in self.histcmp_methods:
-            print("------------------------------------")
+
             if m == 0:
-                print("CORRELATION")
+                method = "CORRELATION"
             elif m == 1:
-                print("INTERSECTION")
+                method = "INTERSECTION"
             elif m == 2:
-                print("CHI SQUARE")
+                method = "CHI SQUARE"
             else:
-                print("BHATTACHARYYA")
+                method = "BHATTACHARYYA"
+
+            table_data = list()
             for i, file in enumerate(get_video_filenames("../footage/")):
                 hist_b = np.loadtxt('../histogram_data/{}/hist-b'.format(file), dtype=np.float32, unpack=False)
                 hist_g = np.loadtxt('../histogram_data/{}/hist-g'.format(file), dtype=np.float32, unpack=False)
@@ -180,7 +183,7 @@ class HistogramGenerator:
                 comparison_g = cv2.compareHist(hist_recording['g'], hist_g, m)
                 comparison_r = cv2.compareHist(hist_recording['r'], hist_r, m)
                 comparison = (comparison_b + comparison_g + comparison_r) / 3
-                print("comparison with {} = {}".format(file, comparison))
+                table_data.append([file, round(comparison, 5)])
                 if i == 0:
                     video_match = file
                     video_match_value = comparison
@@ -191,7 +194,13 @@ class HistogramGenerator:
                     elif m in [1, 3] and comparison < video_match_value:
                         video_match = file
                         video_match_value = comparison
-            print("Match found: {}".format(video_match))
+
+            table = DoubleTable(table_data)
+            table.title = method
+            table.inner_heading_row_border = False
+            table.inner_row_border = True
+            print(table.table)
+            print("Match found: " + "\x1b[1;31m" + video_match + "\x1b[0m" + "\n\n")
 
     def check_video_capture(self):
         """
