@@ -10,6 +10,7 @@ jedi==0.13.2
 kiwisolver==1.0.1
 matplotlib==3.0.2
 numpy==1.16.0
+opencv-contrib-python==4.0.0.21
 opencv-python==4.0.0.21
 pandas==0.24.1
 parso==0.3.2
