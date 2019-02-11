@@ -156,9 +156,9 @@ class HistogramGenerator:
 
         # get histogram for the recorded video to match - todo: calculate the histogram on the go
         hist_recording = {
-            'b': np.loadtxt('../histogram_data/recording.mp4/hist-b', dtype=np.float32, unpack=False),
-            'g': np.loadtxt('../histogram_data/recording.mp4/hist-g', dtype=np.float32, unpack=False),
-            'r': np.loadtxt('../histogram_data/recording.mp4/hist-r', dtype=np.float32, unpack=False)
+            'b': np.loadtxt('../histogram_data/{}/hist-b'.format(self.file_name), dtype=np.float32, unpack=False),
+            'g': np.loadtxt('../histogram_data/{}/hist-g'.format(self.file_name), dtype=np.float32, unpack=False),
+            'r': np.loadtxt('../histogram_data/{}/hist-r'.format(self.file_name), dtype=np.float32, unpack=False)
         }
 
         # compare recorded video histogram with histogram of each video
