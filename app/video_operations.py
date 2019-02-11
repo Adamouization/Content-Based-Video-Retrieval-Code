@@ -1,4 +1,5 @@
 import cv2
+from pyspin.spin import make_spin, Box1
 from vidstab import VidStab
 
 
@@ -108,13 +109,13 @@ class VideoStabilizer:
         self.stabilizer = VidStab()
         self.stabilize_video()
 
+    @make_spin(Box1, "Stabilizing video...")
     def stabilize_video(self):
         """
         Stabilizes a mp4 video and outputs the result as an avi file in the same directory.
         :return:
         """
-        print("Stabilizing video...")
         self.stabilizer.stabilize(input_path="{}/{}".format(self.directory, self.file),
                                   output_path="{}/stable-recording.avi".format(self.directory),
                                   border_type="reflect")
-        print("Video stabilized!")
+        print("\nVideo stabilized!")
