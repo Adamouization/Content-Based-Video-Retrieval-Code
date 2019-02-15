@@ -7,9 +7,10 @@ from app.video_operations import ClickAndDrop, VideoStabilizer
 frame_size = (1280, 720)
 
 # stabilize video
-VideoStabilizer("../recordings", "recording1.mp4")
+filename = "recording2"
+VideoStabilizer("../recordings", "{}".format(filename))
 
-cap = cv2.VideoCapture("../recordings/stable-recording.avi")
+cap = cv2.VideoCapture("../recordings/stable-{}.avi".format(filename))
 
 # params for ShiTomasi corner detection, TODO improve tracking points
 feature_params = dict(maxCorners=10,

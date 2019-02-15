@@ -115,7 +115,7 @@ class VideoStabilizer:
         Stabilizes a mp4 video and outputs the result as an avi file in the same directory.
         :return:
         """
-        self.stabilizer.stabilize(input_path="{}/{}".format(self.directory, self.file),
-                                  output_path="{}/stable-recording.avi".format(self.directory),
+        self.stabilizer.stabilize(input_path="{}/{}.mp4".format(self.directory, self.file),
+                                  output_path="{}/stable-{}.avi".format(self.directory, self.file),
                                   border_type="reflect")
         print("\nVideo stabilized!")
