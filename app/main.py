@@ -34,7 +34,7 @@ def test_hist_classifier():
     """
     directory = "../recordings/"
     recordings = ["recording1.mp4", "recording2.mp4", "recording3.mp4"]  # 1: cloud-sky, 2: seal, 3: butterfly
-    file = recordings[2]
+    file = recordings[0]
 
     # calculate histogram for the recorded video
     print("\nPlease crop the recorded video for the histogram to be generated.")
