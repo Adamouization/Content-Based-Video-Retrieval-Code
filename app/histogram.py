@@ -7,6 +7,7 @@ import numpy as np
 from terminaltables import DoubleTable
 
 from app.helpers import get_video_filenames
+import app.config as config
 from app.video_operations import ClickAndDrop
 
 
@@ -52,11 +53,12 @@ class HistogramGenerator:
                         histogram = cv2.calcHist([frame], [i], None, [256], [0, 256])
                         histogram = cv2.normalize(histogram, histogram)
                         self.histograms_dict[col].append(histogram)
-                        # debugging:
-                        # print("i: {}, col: {}".format(i, col))
-                        # plt.plot(histogram, color=col)
-                        # plt.xlim([0, 256])
-                    # plt.show()
+                        if config.debug:  # show individual BGR histogram plots
+                            print("i: {}, col: {}".format(i, col))
+                            plt.plot(histogram, color=col)
+                            plt.xlim([0, 256])
+                    if config.debug:
+                        plt.show()
 
                     # user exit on "q" or "Esc" key press
                     k = cv2.waitKey(30) & 0xFF
@@ -83,10 +85,10 @@ class HistogramGenerator:
             if ret:
                 if frame_counter == 0:
                     cad = ClickAndDrop(frame)
-                    # debugging: uncomment to show the cropped frame
-                    # roi_frame = cad.get_roi()
-                    # cv2.imshow('Selected ROI', roi_frame)
-                    # cv2.waitKey(0)
+                    if config.debug:  # show the cropped region of interest
+                        roi_frame = cad.get_roi()
+                        cv2.imshow('Selected ROI', roi_frame)
+                        cv2.waitKey(0)
                     reference_points = cad.get_reference_points()
                 frame_counter += 1
                 if frame_counter in frames_to_process:
@@ -97,14 +99,15 @@ class HistogramGenerator:
                             histogram = cv2.calcHist([roi], [i], None, [256], [0, 256])
                             histogram = cv2.normalize(histogram, histogram)
                             self.histograms_dict[col].append(histogram)
-                            # debugging: uncomment to show individual BGR histogram plots
-                            # print("i: {}, col: {}".format(i, col))
-                            # plt.plot(histogram, color=col)
-                            # plt.xlim([0, 256])
+                            if config.debug:  # show individual BGR histogram plots
+                                print("i: {}, col: {}".format(i, col))
+                                plt.plot(histogram, color=col)
+                                plt.xlim([0, 256])
                         else:
                             print("Error while cropping the recording")
                             exit(0)
-                    # plt.show()
+                    if config.debug:
+                        plt.show()
 
                     # user exit on "q" or "Esc" key press
                     k = cv2.waitKey(30) & 0xFF

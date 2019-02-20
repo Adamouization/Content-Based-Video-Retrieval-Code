@@ -1,12 +1,20 @@
+import argparse
+
 from app.helpers import get_video_filenames
 from app.histogram import HistogramGenerator
+import app.config as settings
 
 
 def main():
     """
-    Program entry point.
+    Program entry point. Parses command line input.
     :return: None
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--debug", help="print values for debugging program", action="store_true")
+    args = parser.parse_args()
+    settings.debug = args.debug
+
     train_hist_classifier()
     test_hist_classifier()
 
