@@ -36,22 +36,36 @@ class HistogramGenerator:
             'r': list()
         }
 
-    def generate_video_rgb_histograms(self):
+    def generate_video_rgb_histogram(self, is_query=False):
         """
-        Generates multiple normalized BGR histograms (one every second) for a DB video.
+        Generates multiple normalized histograms (one every second) for a video.
+        :param is_query: boolean specifying if the input video is the query video (need to define ROI)
         :return: None
         """
         # determine which frames to process for histograms
         frames_to_process = _get_frames_to_process(self.video_capture)
 
+        reference_points = list()
         frame_counter = 0  # keep track of current frame ID to know to process it or not
         while self.video_capture.isOpened():
             ret, frame = self.video_capture.read()  # read capture frame by frame
             if ret:
+                if is_query and frame_counter == 0:
+                    cad = ClickAndDrop(frame)
+                    if config.debug:  # show the cropped region of interest
+                        roi_frame = cad.get_roi()
+                        cv2.imshow('Selected ROI', roi_frame)
+                        cv2.waitKey(0)
+                    reference_points = cad.get_reference_points()
                 frame_counter += 1
                 if frame_counter in frames_to_process:
                     for i, col in enumerate(self.colours):
-                        histogram = cv2.calcHist([frame], [i], None, [256], [0, 256])
+                        if is_query:
+                            roi = frame[reference_points[0][1]:reference_points[1][1],
+                                        reference_points[0][0]:reference_points[1][0]]
+                            histogram = cv2.calcHist([roi], [i], None, [256], [0, 256])
+                        else:
+                            histogram = cv2.calcHist([frame], [i], None, [256], [0, 256])
                         histogram = cv2.normalize(histogram, histogram)
                         self.histograms_rgb_dict[col].append(histogram)
                         if config.debug:  # show individual BGR histogram plots
@@ -88,7 +102,7 @@ class HistogramGenerator:
                     histogram = cv2.calcHist([gray_frame], [0], None, [256], [0, 256])
                     histogram = cv2.normalize(histogram, histogram)
                     self.histograms_gray_dict.append(histogram)
-                    if config.debug:  # show individual BGR histogram plots
+                    if config.debug:  # show individual grayscale histogram plots
                         plt.figure()
                         plt.title("{} frame {}".format(self.file_name, frame_counter))
                         plt.xlabel("Bins")
@@ -103,55 +117,6 @@ class HistogramGenerator:
             else:
                 break
         self.generate_and_store_average_grayscale_histogram()
-        self.destroy_video_capture()
-
-    def generate_query_video_rgb_histograms(self):
-        """
-        Generates multiple normalized BGR histograms (one every second) for the recorded video to match.
-        Allows the user to crop the video using the first frame as a thumbnail.
-        :return: None
-        """
-        # determine which frames to process for histograms
-        frames_to_process = _get_frames_to_process(self.video_capture)
-
-        reference_points = list()
-        frame_counter = 0  # keep track of current frame ID to know to process it or not
-        while self.video_capture.isOpened():
-            ret, frame = self.video_capture.read()  # read capture frame by frame
-            if ret:
-                if frame_counter == 0:
-                    cad = ClickAndDrop(frame)
-                    if config.debug:  # show the cropped region of interest
-                        roi_frame = cad.get_roi()
-                        cv2.imshow('Selected ROI', roi_frame)
-                        cv2.waitKey(0)
-                    reference_points = cad.get_reference_points()
-                frame_counter += 1
-                if frame_counter in frames_to_process:
-                    for i, col in enumerate(self.colours):
-                        if len(reference_points) == 2:
-                            roi = frame[reference_points[0][1]:reference_points[1][1],
-                                        reference_points[0][0]:reference_points[1][0]]
-                            histogram = cv2.calcHist([roi], [i], None, [256], [0, 256])
-                            histogram = cv2.normalize(histogram, histogram)
-                            self.histograms_rgb_dict[col].append(histogram)
-                            if config.debug:  # show individual BGR histogram plots
-                                print("i: {}, col: {}".format(i, col))
-                                plt.plot(histogram, color=col)
-                                plt.xlim([0, 256])
-                        else:
-                            print("Error while cropping the recording")
-                            exit(0)
-                    if config.debug:
-                        plt.show()
-
-                    # user exit on "q" or "Esc" key press
-                    k = cv2.waitKey(30) & 0xFF
-                    if k == 25 or k == 27:
-                        break
-            else:
-                break
-        self.generate_and_store_average_rgb_histogram()
         self.destroy_video_capture()
 
     def generate_query_video_grayscale_histogram(self):
@@ -288,7 +253,7 @@ class HistogramGenerator:
             }
 
         # compare recorded video histogram with histogram of each video
-        print("\n{} Histogram Comparison Results:\n".format(_get_chosen_model_string))
+        print("\n{} Histogram Comparison Results:\n".format(_get_chosen_model_string()))
         for m in self.histcmp_methods:
 
             if m == 0:
@@ -374,7 +339,7 @@ def _get_frames_to_process(vc):
 def _get_chosen_model_string():
     """
     Returns the Histogram Model chosen for the matching process.
-    :return: a string representing the chosen histogram model.
+    :return: a string representing the chosen histogram model
     """
     if config.model == "gray":
         return "Grayscale"

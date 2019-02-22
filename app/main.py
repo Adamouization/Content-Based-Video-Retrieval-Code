@@ -39,7 +39,7 @@ def train_hist_classifier():
         if settings.model == "gray":
             histogram_generator.generate_video_grayscale_histograms()
         elif settings.model == "rgb":
-            histogram_generator.generate_video_rgb_histograms()
+            histogram_generator.generate_video_rgb_histogram()
     print("\nGenerated histograms for all files in directory {}".format(directory))
 
 
@@ -59,7 +59,7 @@ def test_hist_classifier():
     if settings.model == "gray":
         histogram_generator.generate_query_video_grayscale_histogram()
     elif settings.model == "rgb":
-        histogram_generator.generate_query_video_rgb_histograms()
+        histogram_generator.generate_video_rgb_histogram(is_query=True)
     histogram_generator.match_histograms()
     print("Finished matching video using histogram comparison technique.")
 
