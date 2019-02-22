@@ -270,11 +270,6 @@ class HistogramGenerator:
         results as probabilities.
         :return: None
         """
-        if config.model == "gray":
-            method_chosen = "Grayscale"
-        elif config.model == "rgb":
-            method_chosen = "RGB"
-
         # variables used for finding the match to the recorded video
         video_match = ""
         video_match_value = 0
@@ -293,7 +288,7 @@ class HistogramGenerator:
             }
 
         # compare recorded video histogram with histogram of each video
-        print("\n{} Histogram Comparison Results:\n".format(method_chosen))
+        print("\n{} Histogram Comparison Results:\n".format(_get_chosen_model_string))
         for m in self.histcmp_methods:
 
             if m == 0:
@@ -374,3 +369,14 @@ def _get_frames_to_process(vc):
     for i in range(1, int(total_frames) + 1, math.ceil(fps)):
         frame_ids.append(i)
     return frame_ids
+
+
+def _get_chosen_model_string():
+    """
+    Returns the Histogram Model chosen for the matching process.
+    :return: a string representing the chosen histogram model.
+    """
+    if config.model == "gray":
+        return "Grayscale"
+    elif config.model == "rgb":
+        return "RGB"
