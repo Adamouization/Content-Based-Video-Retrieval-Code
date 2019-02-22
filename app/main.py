@@ -11,9 +11,15 @@ def main():
     :return: None
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--debug", help="print values for debugging program", action="store_true")
+    parser.add_argument("-m", "--model",
+                        required=True,
+                        help="The histogram model to use. Choose from the following options: 'rgb' or 'gray'.")
+    parser.add_argument("-d", "--debug",
+                        action="store_true",
+                        help="Specify whether you want to print additional logs for debugging purposes.")
     args = parser.parse_args()
     settings.debug = args.debug
+    settings.model = args.model
 
     train_hist_classifier()
     test_hist_classifier()
