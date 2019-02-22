@@ -160,7 +160,7 @@ class HistogramGenerator:
             np.savetxt("../histogram_data/{}/hist-{}".format(self.file_name, col), avg_histogram, fmt='%f')
             plt.plot(avg_histogram, color=col)
             plt.xlim([0, 256])
-        plt.title("RGB histogram for {}".format(self.file_name))
+        plt.title("RGB histogram for '{}'".format(self.file_name))
         plt.xlabel("Bins")
         plt.show()
 
@@ -192,7 +192,7 @@ class HistogramGenerator:
         np.savetxt("../histogram_data/{}/hist-{}".format(self.file_name, col), avg_histogram, fmt='%f')
         plt.plot(avg_histogram, color=col)
         plt.xlim([0, 256])
-        plt.title('Grayscale histogra for {}'.format(self.file_name))
+        plt.title("Grayscale histogram for '{}'".format(self.file_name))
         plt.xlabel("Bins")
         plt.show()
 
