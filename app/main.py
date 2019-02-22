@@ -36,7 +36,10 @@ def train_hist_classifier():
     for file in files:
         print("generating histogram for {}".format(file))
         histogram_generator = HistogramGenerator(directory, file)
-        histogram_generator.generate_video_histograms()
+        if settings.model == "gray":
+            histogram_generator.generate_video_grayscale_histograms()
+        elif settings.model == "rgb":
+            histogram_generator.generate_video_rgb_histograms()
     print("\nGenerated histograms for all files in directory {}".format(directory))
 
 
@@ -53,7 +56,10 @@ def test_hist_classifier():
     # calculate histogram for the recorded video
     print("\nPlease crop the recorded video for the histogram to be generated.")
     histogram_generator = HistogramGenerator(directory, file)
-    histogram_generator.generate_recording_video_histograms()
+    if settings.model == "gray":
+        histogram_generator.generate_query_video_grayscale_histogram()
+    elif settings.model == "rgb":
+        histogram_generator.generate_query_video_rgb_histograms()
     histogram_generator.match_histograms()
     print("Finished matching video using histogram comparison technique.")
 
