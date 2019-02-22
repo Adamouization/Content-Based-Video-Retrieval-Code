@@ -39,7 +39,7 @@ class HistogramGenerator:
     def generate_video_rgb_histogram(self, is_query=False):
         """
         Generates multiple normalized histograms (one every second) for a video.
-        :param is_query: boolean specifying if the input video is the query video (need to define ROI)
+        :param is_query: boolean specifying if the input video is the query video (to select ROI)
         :return: None
         """
         # determine which frames to process for histograms
@@ -60,7 +60,7 @@ class HistogramGenerator:
                 frame_counter += 1
                 if frame_counter in frames_to_process:
                     for i, col in enumerate(self.colours):
-                        if is_query:
+                        if is_query and len(reference_points) == 2:
                             roi = frame[reference_points[0][1]:reference_points[1][1],
                                         reference_points[0][0]:reference_points[1][0]]
                             histogram = cv2.calcHist([roi], [i], None, [256], [0, 256])
@@ -84,45 +84,10 @@ class HistogramGenerator:
         self.generate_and_store_average_rgb_histogram()
         self.destroy_video_capture()
 
-    def generate_video_grayscale_histograms(self):
+    def generate_video_grayscale_histogram(self, is_query=False):
         """
-        Generates multiple normalized grayscale histograms (one every second) for a DB video.
-        :return: None
-        """
-        # determine which frames to process for histograms
-        frames_to_process = _get_frames_to_process(self.video_capture)
-
-        frame_counter = 0  # keep track of current frame ID to know to process it or not
-        while self.video_capture.isOpened():
-            ret, frame = self.video_capture.read()  # read capture frame by frame
-            if ret:
-                frame_counter += 1
-                if frame_counter in frames_to_process:
-                    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                    histogram = cv2.calcHist([gray_frame], [0], None, [256], [0, 256])
-                    histogram = cv2.normalize(histogram, histogram)
-                    self.histograms_gray_dict.append(histogram)
-                    if config.debug:  # show individual grayscale histogram plots
-                        plt.figure()
-                        plt.title("{} frame {}".format(self.file_name, frame_counter))
-                        plt.xlabel("Bins")
-                        plt.plot(histogram)
-                        plt.xlim([0, 256])
-                        plt.show()
-
-                    # user exit on "q" or "Esc" key press
-                    k = cv2.waitKey(30) & 0xFF
-                    if k == 25 or k == 27:
-                        break
-            else:
-                break
-        self.generate_and_store_average_grayscale_histogram()
-        self.destroy_video_capture()
-
-    def generate_query_video_grayscale_histogram(self):
-        """
-        Generates multiple normalized grayscale histograms (one every second) for the recorded video to match.
-        Allows the user to crop the video using the first frame as a thumbnail.
+        Generates multiple normalized grayscale histograms (one every second) for a video.
+        :param is_query: boolean specifying if the input video is the query video (to select ROI)
         :return: None
         """
         # determine which frames to process for histograms
@@ -133,7 +98,7 @@ class HistogramGenerator:
         while self.video_capture.isOpened():
             ret, frame = self.video_capture.read()  # read capture frame by frame
             if ret:
-                if frame_counter == 0:
+                if is_query and frame_counter == 0:
                     cad = ClickAndDrop(frame)
                     if config.debug:  # show the cropped region of interest
                         roi_frame = cad.get_roi()
@@ -142,23 +107,23 @@ class HistogramGenerator:
                     reference_points = cad.get_reference_points()
                 frame_counter += 1
                 if frame_counter in frames_to_process:
-                    if len(reference_points) == 2:
+                    if is_query and len(reference_points) == 2:
                         roi = frame[reference_points[0][1]:reference_points[1][1],
                                     reference_points[0][0]:reference_points[1][0]]
                         roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
                         histogram = cv2.calcHist([roi_gray], [0], None, [256], [0, 256])
-                        histogram = cv2.normalize(histogram, histogram)
-                        self.histograms_gray_dict.append(histogram)
-                        if config.debug:  # show individual HSV histogram plots
-                            plt.figure()
-                            plt.title("{} frame {}".format(self.file_name, frame_counter))
-                            plt.xlabel("Bins")
-                            plt.plot(histogram)
-                            plt.xlim([0, 256])
-                            plt.show()
                     else:
-                        print("Error while cropping the recording")
-                        exit(0)
+                        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                        histogram = cv2.calcHist([gray_frame], [0], None, [256], [0, 256])
+                    histogram = cv2.normalize(histogram, histogram)
+                    self.histograms_gray_dict.append(histogram)
+                    if config.debug:  # show individual grayscale histogram plots
+                        plt.figure()
+                        plt.title("{} frame {}".format(self.file_name, frame_counter))
+                        plt.xlabel("Bins")
+                        plt.plot(histogram)
+                        plt.xlim([0, 256])
+                        plt.show()
 
                     # user exit on "q" or "Esc" key press
                     k = cv2.waitKey(30) & 0xFF
