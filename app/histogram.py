@@ -13,7 +13,8 @@ from app.video_operations import ClickAndDrop
 
 class HistogramGenerator:
     colours = ('b', 'g', 'r')
-    histcmp_methods = [cv2.HISTCMP_CORREL, cv2.HISTCMP_CHISQR, cv2.HISTCMP_INTERSECT, cv2.HISTCMP_BHATTACHARYYA]
+    histcmp_methods = [cv2.HISTCMP_CORREL, cv2.HISTCMP_CHISQR, cv2.HISTCMP_INTERSECT, cv2.HISTCMP_BHATTACHARYYA,
+                       cv2.HISTCMP_CHISQR_ALT, cv2.HISTCMP_KL_DIV]
 
     def __init__(self, directory, file_name):
         """
@@ -229,8 +230,12 @@ class HistogramGenerator:
                 method = "INTERSECTION"
             elif m == 2:
                 method = "CHI SQUARE"
-            else:
+            elif m == 3:
                 method = "BHATTACHARYYA"
+            elif m == 4:
+                method = "ALTERNATIVE CHI-SQUARE"
+            elif m == 5:
+                method = "KULLBACK-LEIBLER DIVERGENCE"
 
             table_data = list()
             for i, file in enumerate(get_video_filenames("../footage/")):
@@ -254,7 +259,7 @@ class HistogramGenerator:
                     if m in [0, 2] and comparison > video_match_value:
                         video_match = file
                         video_match_value = comparison
-                    elif m in [1, 3] and comparison < video_match_value:
+                    elif m in [1, 3, 4, 5] and comparison < video_match_value:
                         video_match = file
                         video_match_value = comparison
 
