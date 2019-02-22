@@ -159,7 +159,8 @@ class HistogramGenerator:
             np.savetxt("../histogram_data/{}/hist-{}".format(self.file_name, col), avg_histogram, fmt='%f')
             plt.plot(avg_histogram, color=col)
             plt.xlim([0, 256])
-        plt.title('{}'.format(self.file_name))
+        plt.title("RGB histogram for {}".format(self.file_name))
+        plt.xlabel("Bins")
         plt.show()
 
     def generate_and_store_average_grayscale_histogram(self):
@@ -190,7 +191,8 @@ class HistogramGenerator:
         np.savetxt("../histogram_data/{}/hist-{}".format(self.file_name, col), avg_histogram, fmt='%f')
         plt.plot(avg_histogram, color=col)
         plt.xlim([0, 256])
-        plt.title('{}'.format(self.file_name))
+        plt.title('Grayscale histogra for {}'.format(self.file_name))
+        plt.xlabel("Bins")
         plt.show()
 
     def match_histograms(self):
