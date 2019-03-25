@@ -6,6 +6,7 @@ recordings/stable-recording.avi
 recordings/test.png
 recordings/query.png
 recordings/train.png
+results/csv
 *.avi
 
 

@@ -1,3 +1,4 @@
+import csv
 import math
 import os
 
@@ -279,7 +280,7 @@ class HistogramGenerator:
         """
         Compares the BGR histogram of the recorded video and compares it with each of the saved average BGR histograms
         using different histogram matching methods such as the Chi-Square or Bhattacharyya methods, and prints the
-        results as probabilities.
+        results as probabilities in a CLI table and writes the data to a CSV file.
         :return: None
         """
         # variables used for finding the match to the recorded video
@@ -301,6 +302,7 @@ class HistogramGenerator:
 
         # compare recorded video histogram with histogram of each video
         print("\n{} Histogram Comparison Results:\n".format(_get_chosen_model_string()))
+        method = ""
         for m in self.histcmp_methods:
 
             if m == 0:
@@ -316,38 +318,51 @@ class HistogramGenerator:
             elif m == 5:
                 method = "KULLBACK-LEIBLER DIVERGENCE"
 
-            table_data = list()
-            for i, file in enumerate(get_video_filenames("../footage/")):
-                comparison = 0
-                if config.model == "gray":
-                    hist_gray = np.loadtxt("../histogram_data/{}/hist-gray".format(file), dtype=np.float32, unpack=False)
-                    comparison = cv2.compareHist(hist_recording['gray'], hist_gray, m)
-                elif config.model == "rgb":
-                    hist_b = np.loadtxt("../histogram_data/{}/hist-b".format(file), dtype=np.float32, unpack=False)
-                    hist_g = np.loadtxt("../histogram_data/{}/hist-g".format(file), dtype=np.float32, unpack=False)
-                    hist_r = np.loadtxt("../histogram_data/{}/hist-r".format(file), dtype=np.float32, unpack=False)
-                    comparison_b = cv2.compareHist(hist_recording['b'], hist_b, m)
-                    comparison_g = cv2.compareHist(hist_recording['g'], hist_g, m)
-                    comparison_r = cv2.compareHist(hist_recording['r'], hist_r, m)
-                    comparison = (comparison_b + comparison_g + comparison_r) / 3
-                table_data.append([file, round(comparison, 5)])
-                if i == 0:
-                    video_match = file
-                    video_match_value = comparison
-                else:
-                    if m in [0, 2] and comparison > video_match_value:
-                        video_match = file
-                        video_match_value = comparison
-                    elif m in [1, 3, 4, 5] and comparison < video_match_value:
-                        video_match = file
-                        video_match_value = comparison
+            # CSV file to write data to for each method
+            csv_file = open('../results/csv/{}-{}.csv'.format(config.model, method), 'w')
+            with csv_file:
+                field_names = ['video', 'score']
+                writer = csv.DictWriter(csv_file, fieldnames=field_names)
+                writer.writeheader()
 
-            table = DoubleTable(table_data)
-            table.title = method
-            table.inner_heading_row_border = False
-            table.inner_row_border = True
-            print(table.table)
-            print("Match found: " + "\x1b[1;31m" + video_match + "\x1b[0m" + "\n\n")
+                table_data = list()
+                for i, file in enumerate(get_video_filenames("../footage/")):
+                    comparison = 0
+                    if config.model == "gray":
+                        hist_gray = np.loadtxt("../histogram_data/{}/hist-gray".format(file), dtype=np.float32, unpack=False)
+                        comparison = cv2.compareHist(hist_recording['gray'], hist_gray, m)
+                    elif config.model == "rgb":
+                        hist_b = np.loadtxt("../histogram_data/{}/hist-b".format(file), dtype=np.float32, unpack=False)
+                        hist_g = np.loadtxt("../histogram_data/{}/hist-g".format(file), dtype=np.float32, unpack=False)
+                        hist_r = np.loadtxt("../histogram_data/{}/hist-r".format(file), dtype=np.float32, unpack=False)
+                        comparison_b = cv2.compareHist(hist_recording['b'], hist_b, m)
+                        comparison_g = cv2.compareHist(hist_recording['g'], hist_g, m)
+                        comparison_r = cv2.compareHist(hist_recording['r'], hist_r, m)
+                        comparison = (comparison_b + comparison_g + comparison_r) / 3
+
+                    # append data to table
+                    table_data.append([file, round(comparison, 5)])
+
+                    # write data to CSV file
+                    writer.writerow({'video': file, 'score': round(comparison, 5)})
+
+                    if i == 0:
+                        video_match = file
+                        video_match_value = comparison
+                    else:
+                        if m in [0, 2] and comparison > video_match_value:
+                            video_match = file
+                            video_match_value = comparison
+                        elif m in [1, 3, 4, 5] and comparison < video_match_value:
+                            video_match = file
+                            video_match_value = comparison
+
+                table = DoubleTable(table_data)
+                table.title = method
+                table.inner_heading_row_border = False
+                table.inner_row_border = True
+                print(table.table)
+                print("Match found: " + "\x1b[1;31m" + video_match + "\x1b[0m" + "\n\n")
 
     def check_video_capture(self):
         """
