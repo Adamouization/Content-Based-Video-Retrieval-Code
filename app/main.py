@@ -13,7 +13,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--model",
                         required=True,
-                        help="The histogram model to use. Choose from the following options: 'rgb' or 'gray'.")
+                        help="The histogram model to use. Choose from the following options: 'rgb', 'hsv' or 'gray'.")
     parser.add_argument("-d", "--debug",
                         action="store_true",
                         help="Specify whether you want to print additional logs for debugging purposes.")
@@ -21,7 +21,7 @@ def main():
     settings.debug = args.debug
     settings.model = args.model
 
-    train_hist_classifier()
+    # train_hist_classifier()
     test_hist_classifier()
 
 
@@ -40,6 +40,8 @@ def train_hist_classifier():
             histogram_generator.generate_video_grayscale_histogram()
         elif settings.model == "rgb":
             histogram_generator.generate_video_rgb_histogram()
+        elif settings.model == "hsv":
+            histogram_generator.generate_video_hsv_histogram()
     print("\nGenerated histograms for all files in directory {}".format(directory))
 
 
@@ -60,6 +62,8 @@ def test_hist_classifier():
         histogram_generator.generate_video_grayscale_histogram(is_query=True)
     elif settings.model == "rgb":
         histogram_generator.generate_video_rgb_histogram(is_query=True)
+    elif settings.model == "hsv":
+        histogram_generator.generate_video_hsv_histogram(is_query=True)
     histogram_generator.match_histograms()
     print("Finished matching video using histogram comparison technique.")
 

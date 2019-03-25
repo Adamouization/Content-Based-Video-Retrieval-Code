@@ -13,6 +13,7 @@ from app.video_operations import ClickAndDrop
 
 class HistogramGenerator:
     colours = ('b', 'g', 'r')
+    bins = (8, 12, 3)  # 8 hue bins, 12 saturation bins, 3 value bins
     histcmp_methods = [cv2.HISTCMP_CORREL, cv2.HISTCMP_CHISQR, cv2.HISTCMP_INTERSECT, cv2.HISTCMP_BHATTACHARYYA,
                        cv2.HISTCMP_CHISQR_ALT, cv2.HISTCMP_KL_DIV]
 
@@ -36,6 +37,7 @@ class HistogramGenerator:
             'g': list(),
             'r': list()
         }
+        self.histograms_hsv_dict = list()
 
     def generate_video_rgb_histogram(self, is_query=False):
         """
@@ -135,6 +137,48 @@ class HistogramGenerator:
         self.generate_and_store_average_grayscale_histogram()
         self.destroy_video_capture()
 
+    def generate_video_hsv_histogram(self, is_query=False):
+        # determine which frames to process for histograms
+        frames_to_process = _get_frames_to_process(self.video_capture)
+
+        reference_points = list()
+        frame_counter = 0  # keep track of current frame ID to know to process it or not
+        while self.video_capture.isOpened():
+            ret, frame = self.video_capture.read()  # read capture frame by frame
+            if ret:
+                if is_query and frame_counter == 0:
+                    cad = ClickAndDrop(frame)
+                    if config.debug:  # show the cropped region of interest
+                        roi_frame = cad.get_roi()
+                        cv2.imshow("Selected ROI", roi_frame)
+                        cv2.waitKey(0)
+                    reference_points = cad.get_reference_points()
+                frame_counter += 1
+                if frame_counter in frames_to_process:
+                    if is_query and len(reference_points) == 2:
+                        roi = frame[reference_points[0][1]:reference_points[1][1],
+                                    reference_points[0][0]:reference_points[1][0]]
+                        roi_hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+                        histogram = cv2.calcHist([roi_hsv], [0, 1, 2], None, self.bins, [0, 180, 0, 256, 0, 256])
+                    else:
+                        hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+                        histogram = cv2.calcHist([hsv_frame], [0, 1, 2], None, self.bins, [0, 180, 0, 256, 0, 256])
+                    histogram = cv2.normalize(histogram, histogram)
+                    self.histograms_hsv_dict.append(histogram)
+                    if config.debug:  # show individual HSV histogram plots
+                        plt.imshow(histogram)
+                        plt.title("{} frame {}".format(self.file_name, frame_counter))
+                        plt.show()
+
+                    # user exit on "q" or "Esc" key press
+                    k = cv2.waitKey(30) & 0xFF
+                    if k == 25 or k == 27:
+                        break
+            else:
+                break
+        self.generate_and_store_average_hsv_histogram()
+        self.destroy_video_capture()
+
     def generate_and_store_average_rgb_histogram(self):
         """
         Generates a single BGR histogram by averaging all histograms of a video before writing the results to a txt
@@ -194,6 +238,41 @@ class HistogramGenerator:
         plt.xlim([0, 256])
         plt.title("Grayscale histogram for '{}'".format(self.file_name))
         plt.xlabel("Bins")
+        plt.show()
+
+    def generate_and_store_average_hsv_histogram(self):
+        """
+        Generates a single BGR histogram by averaging all histograms of a video before writing the results to a txt
+        file.
+        :return: None
+        """
+        avg_histogram = np.zeros(shape=(255, 1))  # array to store average histogram values
+
+        col = "hsv"
+        hist = self.histograms_hsv_dict
+
+        # todo: calculate average histogram
+
+        for h in range(0, self.bins[0]):  # loop through all bins
+            for s in range(0, self.bins[1]):
+                for v in range(0, self.bins[2]):
+                    print(h, s, v)
+                    bin_sum = 0
+
+                    # get value for each colour histogram in bin i
+                    for arr_index in range(0, len(hist)):
+                        bin_value = hist[arr_index].item(h)
+                        bin_sum += bin_value
+
+                    # average all bins values to store in new histogram
+                    new_bin_value = bin_sum / len(hist)
+                    avg_histogram[i] = new_bin_value
+
+        if not os.path.exists("../histogram_data/{}/".format(self.file_name)):
+            os.makedirs("../histogram_data/{}/".format(self.file_name))
+        np.savetxt("../histogram_data/{}/hist-{}".format(self.file_name, col), avg_histogram, fmt='%f')
+        plt.imshow(avg_histogram)
+        plt.title("HSV histogram for '{}'".format(self.file_name))
         plt.show()
 
     def match_histograms(self):
