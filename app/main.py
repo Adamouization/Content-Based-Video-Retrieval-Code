@@ -12,17 +12,28 @@ def main():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--model",
-                        required=True,
                         help="The histogram model to use. Choose from the following options: 'rgb', 'hsv' or 'gray'.")
+    parser.add_argument("--mode",
+                        required=True,
+                        help="The mode to run the code in. Choose from the following options: 'train', 'test' or "
+                             "'segment'.")
     parser.add_argument("-d", "--debug",
                         action="store_true",
                         help="Specify whether you want to print additional logs for debugging purposes.")
     args = parser.parse_args()
     settings.debug = args.debug
+    settings.mode = args.mode
     settings.model = args.model
 
-    # train_hist_classifier()
-    test_hist_classifier()
+    if settings.mode == 'train':
+        train_hist_classifier()
+    elif settings.mode == 'test':
+        test_hist_classifier()
+    elif settings.mode == 'segment':
+        segment_video()
+    else:
+        print("Wrong mode chosen. Choose from the following options: 'train', 'test' or 'segment'.")
+        exit(0)
 
 
 def train_hist_classifier():
@@ -66,6 +77,10 @@ def test_hist_classifier():
         histogram_generator.generate_video_hsv_histogram(is_query=True)
     histogram_generator.match_histograms()
     print("Finished matching video using histogram comparison technique.")
+
+
+def segment_video():
+    print("shot boundary detection")
 
 
 if __name__ == "__main__":
