@@ -6,7 +6,7 @@ recordings/stable-recording.avi
 recordings/test.png
 recordings/query.png
 recordings/train.png
-results/histogram-comparison.xlsx
+results/histogram-comparisons.xlsx
 results/csv
 *.avi
 
