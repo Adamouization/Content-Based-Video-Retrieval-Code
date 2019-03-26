@@ -80,7 +80,12 @@ def test_hist_classifier():
 
 
 def segment_video():
-    print("shot boundary detection")
+    directory = "../recordings/"
+    video = "scene-segmentation.mp4"
+
+    shot_boundary_detector = HistogramGenerator(directory, video)
+    shot_boundary_detector.rgb_histogram_shot_boundary_detection()
+    print("Finished detecting shot boundaries for {}.".format(video))
 
 
 if __name__ == "__main__":

@@ -364,6 +364,78 @@ class HistogramGenerator:
                 print(table.table)
                 print("Match found: " + "\x1b[1;31m" + video_match + "\x1b[0m" + "\n\n")
 
+    def rgb_histogram_shot_boundary_detection(self):
+        """
+        Compares consecutive frames' RGB histograms using the Kullback-Leibler Divergence metric. If the metric is
+        bigger than the specified threshold, then a shot boundary has been detected.
+        :return: None
+        """
+        threshold = 10
+        x_axis = list()
+        y_axis = list()
+        is_under_threshold = True
+
+        ret, frame = self.video_capture.read()  # get initial frame
+
+        frame_counter = 0  # keep track of current frame ID to locate shot boundaries
+        while self.video_capture.isOpened():
+            prev_frame = frame[:]  # previous frame
+            ret, frame = self.video_capture.read()  # read capture frame by frame
+
+            if ret:
+                frame_counter += 1
+                cur_rgb_hist = {
+                    'b': list(),
+                    'g': list(),
+                    'r': list()
+                }
+                prev_rgb_hist = {
+                    'b': list(),
+                    'g': list(),
+                    'r': list()
+                }
+                for i, col in enumerate(self.colours):
+                    # calculate RGB histograms
+                    cur_frame_hist = cv2.calcHist([frame], [i], None, [256], [0, 256])
+                    prev_frame_hist = cv2.calcHist([prev_frame], [i], None, [256], [0, 256])
+
+                    # normalize histograms
+                    cur_frame_hist = cv2.normalize(cur_frame_hist, cur_frame_hist)
+                    prev_frame_hist = cv2.normalize(prev_frame_hist, prev_frame_hist)
+
+                    # save histograms in dict
+                    cur_rgb_hist[col].append(cur_frame_hist)
+                    prev_rgb_hist[col].append(prev_frame_hist)
+
+                # calculate Kullback-Leibler Divergence between consecutive frames
+                comparison_r = cv2.compareHist(prev_rgb_hist['r'][0], cur_rgb_hist['r'][0], cv2.HISTCMP_KL_DIV)
+                comparison_g = cv2.compareHist(prev_rgb_hist['g'][0], cur_rgb_hist['g'][0], cv2.HISTCMP_KL_DIV)
+                comparison_b = cv2.compareHist(prev_rgb_hist['b'][0], cur_rgb_hist['b'][0], cv2.HISTCMP_KL_DIV)
+                comparison = (comparison_b + comparison_g + comparison_r) / 3
+
+                # append data to lists for plot
+                x_axis.append(frame_counter)
+                y_axis.append(comparison)
+
+                if comparison > threshold and is_under_threshold:
+                    is_under_threshold = False
+                    print("Scene Change detected at Frame {}".format(frame_counter))
+                elif comparison < threshold:
+                    is_under_threshold = True
+
+            else:
+                break
+
+        # Plot results
+        plt.plot(x_axis, y_axis)
+        plt.plot(x_axis, np.full(frame_counter, 10))
+        plt.title("Kullback-Leibler Divergence Between Consecutive Frame RGB Histogram")
+        plt.xlabel("Frame")
+        plt.ylabel("KL Divergence")
+        plt.show()
+
+        self.destroy_video_capture()
+
     def check_video_capture(self):
         """
         Checks if the VideoCapture object was correctly created.
