@@ -1,6 +1,7 @@
 import csv
 import math
 import os
+import pickle
 
 import cv2
 from matplotlib import pyplot as plt
@@ -247,31 +248,35 @@ class HistogramGenerator:
         file.
         :return: None
         """
-        avg_histogram = np.zeros(shape=(255, 1))  # array to store average histogram values
+        avg_histogram = np.zeros(shape=(8, 12, 3))  # array to store average histogram values
 
         col = "hsv"
         hist = self.histograms_hsv_dict
 
         # todo: calculate average histogram
 
-        for h in range(0, self.bins[0]):  # loop through all bins
-            for s in range(0, self.bins[1]):
-                for v in range(0, self.bins[2]):
-                    print(h, s, v)
+        for h in range(0, self.bins[0]):  # loop through hue bins
+            for s in range(0, self.bins[1]):  # loop through saturation bins
+                for v in range(0, self.bins[2]):  # loop through value bins
                     bin_sum = 0
 
-                    # get value for each colour histogram in bin i
+                    # get value for each colour histogram in bin [h][s][v]
                     for arr_index in range(0, len(hist)):
-                        bin_value = hist[arr_index].item(h)
+                        bin_value = hist[arr_index][h][s][v]
                         bin_sum += bin_value
 
                     # average all bins values to store in new histogram
                     new_bin_value = bin_sum / len(hist)
-                    avg_histogram[i] = new_bin_value
+                    avg_histogram[h][s][v] = new_bin_value
 
         if not os.path.exists("../histogram_data/{}/".format(self.file_name)):
             os.makedirs("../histogram_data/{}/".format(self.file_name))
-        np.savetxt("../histogram_data/{}/hist-{}".format(self.file_name, col), avg_histogram, fmt='%f')
+
+        # np.savetxt("../histogram_data/{}/hist-{}".format(self.file_name, col), avg_histogram, fmt='%f')
+        file = open("../histogram_data/{}/hist-{}.dat".format(self.file_name, col), 'wb')
+        pickle.dump(avg_histogram, file)
+        file.close()
+
         plt.imshow(avg_histogram)
         plt.title("HSV histogram for '{}'".format(self.file_name))
         plt.show()
