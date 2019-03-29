@@ -1,8 +1,9 @@
 import argparse
+import time
 
 from pyspin.spin import make_spin, Spin2
 
-from app.helpers import get_video_filenames
+from app.helpers import get_video_filenames, print_finished_training_message
 from app.histogram import HistogramGenerator
 import app.config as settings
 
@@ -14,7 +15,8 @@ def main():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--model",
-                        help="The histogram model to use. Choose from the following options: 'rgb', 'hsv' or 'gray'.")
+                        help="The histogram model to use. Choose from the following options: 'rgb', 'hsv' or 'gray'. "
+                             "Leave empty to train using all 3 histogram models.")
     parser.add_argument("--mode",
                         required=True,
                         help="The mode to run the code in. Choose from the following options: 'train', 'test' or "
@@ -47,6 +49,9 @@ def train_hist_classifier():
     directory = "../footage/"
     files = get_video_filenames(directory)
 
+    # start measuring runtime
+    start_time = time.time()
+
     for file in files:
         histogram_generator = HistogramGenerator(directory, file)
         if settings.model == "gray":
@@ -55,10 +60,15 @@ def train_hist_classifier():
             histogram_generator.generate_video_rgb_histogram()
         elif settings.model == "hsv":
             histogram_generator.generate_video_hsv_histogram()
-    print(
-        "\nGenerated " + "\x1b[1;31m" + "{}".format(settings.model) + "\x1b[0m" +
-        " histograms for all videos in directory '{}'".format(directory)
-    )
+        else:
+            histogram_generator_gray = HistogramGenerator(directory, file)
+            histogram_generator_gray.generate_video_grayscale_histogram()
+            histogram_generator_rgb = HistogramGenerator(directory, file)
+            histogram_generator_rgb.generate_video_rgb_histogram()
+            histogram_generator_hsv = HistogramGenerator(directory, file)
+            histogram_generator_hsv.generate_video_hsv_histogram()
+    runtime = round(time.time() - start_time, 2)
+    print_finished_training_message(settings.model, directory, runtime)
 
 
 def test_hist_classifier():

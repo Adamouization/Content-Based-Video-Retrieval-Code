@@ -1,4 +1,5 @@
 import os
+import time
 
 from terminaltables import DoubleTable
 
@@ -30,3 +31,19 @@ def print_terminal_table(table_data, method_used):
     table.inner_heading_row_border = False
     table.inner_row_border = True
     print(table.table)
+
+
+def print_finished_training_message(model, directory, runtime):
+    """
+    Prints a message at the end of the training function.
+    :param model: the histogram model used for training
+    :param directory: the directory where the training dataset is
+    :param runtime: the time elapsed in seconds
+    :return: None
+    """
+    print(
+        "\n\nGenerated " + "\x1b[1;31m" + "{}".format(model) + "\x1b[0m" +
+        " histograms for all videos in directory '{}'".format(directory)
+    )
+    print("\n--- Runtime: {} seconds ---".format(runtime))
+
