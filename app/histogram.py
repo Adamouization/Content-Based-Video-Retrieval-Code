@@ -1,14 +1,13 @@
 import csv
 import math
 import os
-import pickle
 
 import cv2
 from matplotlib import pyplot as plt
 import numpy as np
-from terminaltables import DoubleTable
+from scipy.stats import energy_distance, wasserstein_distance
 
-from app.helpers import get_video_filenames
+from app.helpers import get_video_filenames, print_terminal_table
 import app.config as config
 from app.video_operations import ClickAndDrop
 
@@ -18,6 +17,7 @@ class HistogramGenerator:
     bins = (8, 12, 3)  # 8 hue bins, 12 saturation bins, 3 value bins
     histcmp_methods = [cv2.HISTCMP_CORREL, cv2.HISTCMP_CHISQR, cv2.HISTCMP_INTERSECT, cv2.HISTCMP_BHATTACHARYYA,
                        cv2.HISTCMP_CHISQR_ALT, cv2.HISTCMP_KL_DIV]
+    histcmp_3d_methods = ["wasserstein_distance", "energy_distance"]
 
     def __init__(self, directory, file_name):
         """
@@ -253,8 +253,6 @@ class HistogramGenerator:
         col = "hsv"
         hist = self.histograms_hsv_dict
 
-        # todo: calculate average histogram
-
         for h in range(0, self.bins[0]):  # loop through hue bins
             for s in range(0, self.bins[1]):  # loop through saturation bins
                 for v in range(0, self.bins[2]):  # loop through value bins
@@ -271,11 +269,11 @@ class HistogramGenerator:
 
         if not os.path.exists("../histogram_data/{}/".format(self.file_name)):
             os.makedirs("../histogram_data/{}/".format(self.file_name))
-
-        # np.savetxt("../histogram_data/{}/hist-{}".format(self.file_name, col), avg_histogram, fmt='%f')
-        file = open("../histogram_data/{}/hist-{}.dat".format(self.file_name, col), 'wb')
-        pickle.dump(avg_histogram, file)
-        file.close()
+        with open("../histogram_data/{}/hist-{}".format(self.file_name, col), 'w') as file:
+            file.write("# HSV Histogram shape: {0}\n".format(avg_histogram.shape))
+            for arr_2d in avg_histogram:
+                np.savetxt(file, arr_2d)
+                file.write("# New slice\n")
 
         plt.imshow(avg_histogram)
         plt.title("HSV histogram for '{}'".format(self.file_name))
@@ -304,70 +302,121 @@ class HistogramGenerator:
                 'g': np.loadtxt("../histogram_data/{}/hist-g".format(self.file_name), dtype=np.float32, unpack=False),
                 'r': np.loadtxt("../histogram_data/{}/hist-r".format(self.file_name), dtype=np.float32, unpack=False)
             }
+        elif config.model == "hsv":
+            hsv_data = np.loadtxt("../histogram_data/{}/hist-hsv".format(self.file_name))
+            hist_recording = {
+                'hsv': hsv_data.reshape((8, 12, 3))
+            }
 
         # compare recorded video histogram with histogram of each video
         print("\n{} Histogram Comparison Results:\n".format(_get_chosen_model_string()))
+
         method = ""
-        for m in self.histcmp_methods:
+        field_names = ["video", "score"]
 
-            if m == 0:
-                method = "CORRELATION"
-            elif m == 1:
-                method = "INTERSECTION"
-            elif m == 2:
-                method = "CHI SQUARE"
-            elif m == 3:
-                method = "BHATTACHARYYA"
-            elif m == 4:
-                method = "ALTERNATIVE CHI-SQUARE"
-            elif m == 5:
-                method = "KULLBACK-LEIBLER DIVERGENCE"
+        # use OpenCV's compareHist function for RGB and gray scale histograms (works with 2d arrays only)
+        if config.model == "rgb" or config.model == "gray":
+            for m in self.histcmp_methods:
 
-            # CSV file to write data to for each method
-            csv_file = open('../results/csv/{}-{}.csv'.format(config.model, method), 'w')
-            with csv_file:
-                field_names = ['video', 'score']
-                writer = csv.DictWriter(csv_file, fieldnames=field_names)
-                writer.writeheader()
+                if m == 0:
+                    method = "CORRELATION"
+                elif m == 1:
+                    method = "INTERSECTION"
+                elif m == 2:
+                    method = "CHI SQUARE"
+                elif m == 3:
+                    method = "BHATTACHARYYA"
+                elif m == 4:
+                    method = "ALTERNATIVE CHI-SQUARE"
+                elif m == 5:
+                    method = "KULLBACK-LEIBLER DIVERGENCE"
 
-                table_data = list()
-                for i, file in enumerate(get_video_filenames("../footage/")):
-                    comparison = 0
-                    if config.model == "gray":
-                        hist_gray = np.loadtxt("../histogram_data/{}/hist-gray".format(file), dtype=np.float32, unpack=False)
-                        comparison = cv2.compareHist(hist_recording['gray'], hist_gray, m)
-                    elif config.model == "rgb":
-                        hist_b = np.loadtxt("../histogram_data/{}/hist-b".format(file), dtype=np.float32, unpack=False)
-                        hist_g = np.loadtxt("../histogram_data/{}/hist-g".format(file), dtype=np.float32, unpack=False)
-                        hist_r = np.loadtxt("../histogram_data/{}/hist-r".format(file), dtype=np.float32, unpack=False)
-                        comparison_b = cv2.compareHist(hist_recording['b'], hist_b, m)
-                        comparison_g = cv2.compareHist(hist_recording['g'], hist_g, m)
-                        comparison_r = cv2.compareHist(hist_recording['r'], hist_r, m)
-                        comparison = (comparison_b + comparison_g + comparison_r) / 3
+                # CSV file to write data to for each method
+                csv_file = open('../results/csv/{}-{}.csv'.format(config.model, method), 'w')
+                with csv_file:
+                    writer = csv.DictWriter(csv_file, fieldnames=field_names)
+                    writer.writeheader()
 
-                    # append data to table
-                    table_data.append([file, round(comparison, 5)])
+                    table_data = list()
+                    for i, file in enumerate(get_video_filenames("../footage/")):
+                        comparison = 0
+                        if config.model == "gray":
+                            hist_gray = np.loadtxt("../histogram_data/{}/hist-gray".format(file), dtype=np.float32, unpack=False)
+                            comparison = cv2.compareHist(hist_recording['gray'], hist_gray, m)
+                        elif config.model == "rgb":
+                            hist_b = np.loadtxt("../histogram_data/{}/hist-b".format(file), dtype=np.float32, unpack=False)
+                            hist_g = np.loadtxt("../histogram_data/{}/hist-g".format(file), dtype=np.float32, unpack=False)
+                            hist_r = np.loadtxt("../histogram_data/{}/hist-r".format(file), dtype=np.float32, unpack=False)
+                            comparison_b = cv2.compareHist(hist_recording['b'], hist_b, m)
+                            comparison_g = cv2.compareHist(hist_recording['g'], hist_g, m)
+                            comparison_r = cv2.compareHist(hist_recording['r'], hist_r, m)
+                            comparison = (comparison_b + comparison_g + comparison_r) / 3
 
-                    # write data to CSV file
-                    writer.writerow({'video': file, 'score': round(comparison, 5)})
+                        # append data to table
+                        table_data.append([file, round(comparison, 5)])
 
-                    if i == 0:
-                        video_match = file
-                        video_match_value = comparison
-                    else:
-                        if m in [0, 2] and comparison > video_match_value:
+                        # write data to CSV file
+                        writer.writerow({'video': file, 'score': round(comparison, 5)})
+
+                        if i == 0:
                             video_match = file
                             video_match_value = comparison
-                        elif m in [1, 3, 4, 5] and comparison < video_match_value:
+                        else:
+                            if m in [0, 2] and comparison > video_match_value:
+                                video_match = file
+                                video_match_value = comparison
+                            elif m in [1, 3, 4, 5] and comparison < video_match_value:
+                                video_match = file
+                                video_match_value = comparison
+
+                    print_terminal_table(table_data, method)
+                    print("Match found: " + "\x1b[1;31m" + video_match + "\x1b[0m" + "\n\n")
+
+        # use SciPy's statistical distances functions for HSV histograms (compareHist does not work with 3d arrays)
+        elif config.model == "hsv":
+            for m in self.histcmp_3d_methods:
+                if m == "wasserstein_distance":
+                    method = "WASSERSTEIN DISTANCE (EMD)"
+                elif m == "energy_distance":
+                    method = "ENERGY DISTANCE"
+
+                # CSV file to write data to for each method
+                csv_file = open('../results/csv/{}-{}.csv'.format(config.model, method), 'w')
+                with csv_file:
+
+                    writer = csv.DictWriter(csv_file, fieldnames=field_names)
+                    writer.writeheader()
+
+                    table_data = list()
+                    for i, file in enumerate(get_video_filenames("../footage/")):
+                        hist_hsv_data = np.loadtxt("../histogram_data/{}/hist-hsv".format(file))
+                        hist_hsv = hist_hsv_data.reshape((8, 12, 3))
+                        comparison = 0
+                        for h in range(0, self.bins[0]):  # loop through hue bins
+                            for s in range(0, self.bins[1]):  # loop through saturation bins
+                                hist_recording_slice = hist_recording['hsv'][h][s]
+                                hist_hsv_slice = hist_hsv[h][s]
+                                if method == "WASSERSTEIN DISTANCE (EMD)":
+                                    comparison += wasserstein_distance(hist_recording_slice, hist_hsv_slice)
+                                elif method == "ENERGY DISTANCE":
+                                    comparison += energy_distance(hist_recording_slice, hist_hsv_slice)
+
+                        # append data to table
+                        table_data.append([file, round(comparison, 5)])
+
+                        # write data to CSV file
+                        writer.writerow({'video': file, 'score': round(comparison, 5)})
+
+                        if i == 0:
                             video_match = file
                             video_match_value = comparison
+                        else:
+                            if comparison < video_match_value:
+                                video_match = file
+                                video_match_value = comparison
 
-                table = DoubleTable(table_data)
-                table.title = method
-                table.inner_heading_row_border = False
-                table.inner_row_border = True
-                print(table.table)
-                print("Match found: " + "\x1b[1;31m" + video_match + "\x1b[0m" + "\n\n")
+                    print_terminal_table(table_data, method)
+                    print("Match found: " + "\x1b[1;31m" + video_match + "\x1b[0m" + "\n\n")
 
     def rgb_histogram_shot_boundary_detection(self):
         """
@@ -488,3 +537,5 @@ def _get_chosen_model_string():
         return "Grayscale"
     elif config.model == "rgb":
         return "RGB"
+    elif config.model == 'hsv':
+        return "HSV"
