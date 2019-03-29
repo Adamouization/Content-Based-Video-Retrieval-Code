@@ -1,5 +1,7 @@
 import argparse
 
+from pyspin.spin import make_spin, Spin2
+
 from app.helpers import get_video_filenames
 from app.histogram import HistogramGenerator
 import app.config as settings
@@ -36,6 +38,7 @@ def main():
         exit(0)
 
 
+@make_spin(Spin2, "Generating histograms...".format(settings.model))
 def train_hist_classifier():
     """
     Generates an averaged BGR histogram for all the videos in the directory-based database.
@@ -45,7 +48,6 @@ def train_hist_classifier():
     files = get_video_filenames(directory)
 
     for file in files:
-        print("generating histogram for {}".format(file))
         histogram_generator = HistogramGenerator(directory, file)
         if settings.model == "gray":
             histogram_generator.generate_video_grayscale_histogram()
@@ -53,7 +55,10 @@ def train_hist_classifier():
             histogram_generator.generate_video_rgb_histogram()
         elif settings.model == "hsv":
             histogram_generator.generate_video_hsv_histogram()
-    print("\nGenerated histograms for all files in directory {}".format(directory))
+    print(
+        "\nGenerated " + "\x1b[1;31m" + "{}".format(settings.model) + "\x1b[0m" +
+        " histograms for all videos in directory '{}'".format(directory)
+    )
 
 
 def test_hist_classifier():
