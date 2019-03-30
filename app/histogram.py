@@ -392,10 +392,10 @@ class HistogramGenerator:
                 # append video match found to results list (using weights)
                 if cur_all_model == "gray":
                     for _ in range(0, self.histogram_comparison_weigths['gray'], 1):
-                        self.results_array.append(video_match + "gray")
+                        self.results_array.append(video_match)
                 elif cur_all_model == "rgb":
                     for _ in range(0, self.histogram_comparison_weigths['rgb'], 1):
-                        self.results_array.append(video_match + "rgb")
+                        self.results_array.append(video_match)
 
                 print_terminal_table(table_data, method)
                 print("{} {} match found: ".format(_get_chosen_model_string(cur_all_model), method) +
@@ -446,7 +446,7 @@ class HistogramGenerator:
 
                 # append video match found to results list (using weights)
                 for _ in range(0, self.histogram_comparison_weigths['hsv']):
-                    self.results_array.append(video_match + "hsv")
+                    self.results_array.append(video_match)
 
                 print_terminal_table(table_data, method)
                 print("{} {} Match found: ".format(_get_chosen_model_string(cur_all_model), method) +

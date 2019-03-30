@@ -116,16 +116,15 @@ def test_hist_classifier():
 
         # calculate distances between query and DB histograms
         histogram_generator_gray.match_histograms(cur_all_model='gray')
-        gray_results = histogram_generator_gray.get_results_array()
         histogram_generator_rgb.match_histograms(cur_all_model='rgb')
-        rgb_results = histogram_generator_rgb.get_results_array()
         histogram_generator_hsv.match_histograms(cur_all_model='hsv')
-        hsv_results = histogram_generator_hsv.get_results_array()
 
         # combine matches from all 3 histogram models to output one final result
-        all_results = gray_results + rgb_results + hsv_results
+        all_results = histogram_generator_hsv.get_results_array()
         results_count = Counter(all_results)
-        # print(results_count)
+        print("Matches made: {}".format(results_count))
+
+        # find best result
         final_result_name = ""
         final_result_count = 0
         for i, r in enumerate(results_count):
@@ -137,7 +136,8 @@ def test_hist_classifier():
                     final_result_name = r
                     final_result_count = results_count[r]
         runtime = round(time.time() - start_time, 2)
-        print_finished_training_message(final_result_name, settings.model, runtime)
+        accuracy = final_result_count / len(all_results)
+        print_finished_training_message(final_result_name, settings.model, runtime, accuracy)
 
 
 def segment_video():
