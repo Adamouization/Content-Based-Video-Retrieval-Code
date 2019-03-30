@@ -1,4 +1,5 @@
 import argparse
+from collections import Counter
 import time
 
 from pyspin.spin import make_spin, Spin2
@@ -53,12 +54,14 @@ def train_hist_classifier():
     start_time = time.time()
 
     for file in files:
-        histogram_generator = HistogramGenerator(directory, file)
         if settings.model == "gray":
+            histogram_generator = HistogramGenerator(directory, file)
             histogram_generator.generate_video_grayscale_histogram()
         elif settings.model == "rgb":
+            histogram_generator = HistogramGenerator(directory, file)
             histogram_generator.generate_video_rgb_histogram()
         elif settings.model == "hsv":
+            histogram_generator = HistogramGenerator(directory, file)
             histogram_generator.generate_video_hsv_histogram()
         else:
             histogram_generator_gray = HistogramGenerator(directory, file)
@@ -81,17 +84,60 @@ def test_hist_classifier():
     recordings = ["recording1.mp4", "recording2.mp4", "recording3.mp4"]  # 1: cloud-sky, 2: seal, 3: butterfly
     file = recordings[0]
 
-    # calculate histogram for the recorded video
     print("\nPlease crop the recorded video for the histogram to be generated.")
-    histogram_generator = HistogramGenerator(directory, file)
+
     if settings.model == "gray":
+        histogram_generator = HistogramGenerator(directory, file)
         histogram_generator.generate_video_grayscale_histogram(is_query=True)
+        histogram_generator.match_histograms()
     elif settings.model == "rgb":
+        histogram_generator = HistogramGenerator(directory, file)
         histogram_generator.generate_video_rgb_histogram(is_query=True)
+        histogram_generator.match_histograms()
     elif settings.model == "hsv":
+        histogram_generator = HistogramGenerator(directory, file)
         histogram_generator.generate_video_hsv_histogram(is_query=True)
-    histogram_generator.match_histograms()
-    print("Finished matching video using histogram comparison technique.")
+        histogram_generator.match_histograms()
+    else:
+        # calculate query histogram
+        # gray scale
+        histogram_generator_gray = HistogramGenerator(directory, file)
+        histogram_generator_gray.generate_video_grayscale_histogram(is_query=True)
+        cur_reference_points = histogram_generator_gray.get_current_reference_points()
+        # RGB
+        histogram_generator_rgb = HistogramGenerator(directory, file)
+        histogram_generator_rgb.generate_video_rgb_histogram(is_query=True, cur_ref_points=cur_reference_points)
+        # HSV
+        histogram_generator_hsv = HistogramGenerator(directory, file)
+        histogram_generator_hsv.generate_video_hsv_histogram(is_query=True, cur_ref_points=cur_reference_points)
+
+        # start measuring runtime
+        start_time = time.time()
+
+        # calculate distances between query and DB histograms
+        histogram_generator_gray.match_histograms(cur_all_model='gray')
+        gray_results = histogram_generator_gray.get_results_array()
+        histogram_generator_rgb.match_histograms(cur_all_model='rgb')
+        rgb_results = histogram_generator_rgb.get_results_array()
+        histogram_generator_hsv.match_histograms(cur_all_model='hsv')
+        hsv_results = histogram_generator_hsv.get_results_array()
+
+        # combine matches from all 3 histogram models to output one final result
+        all_results = gray_results + rgb_results + hsv_results
+        results_count = Counter(all_results)
+        # print(results_count)
+        final_result_name = ""
+        final_result_count = 0
+        for i, r in enumerate(results_count):
+            if i == 0:
+                final_result_name = r
+                final_result_count = results_count[r]
+            else:
+                if results_count[r] > final_result_count:
+                    final_result_name = r
+                    final_result_count = results_count[r]
+        runtime = round(time.time() - start_time, 2)
+        print_finished_training_message(final_result_name, settings.model, runtime)
 
 
 def segment_video():

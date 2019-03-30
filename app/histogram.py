@@ -18,6 +18,12 @@ class HistogramGenerator:
     histcmp_methods = [cv2.HISTCMP_CORREL, cv2.HISTCMP_CHISQR, cv2.HISTCMP_INTERSECT, cv2.HISTCMP_BHATTACHARYYA,
                        cv2.HISTCMP_CHISQR_ALT, cv2.HISTCMP_KL_DIV]
     histcmp_3d_methods = ["wasserstein_distance", "energy_distance"]
+    histogram_comparison_weigths = {  # weights per comparison methods
+        'gray': 1,
+        'rgb': 5,
+        'hsv': 8
+    }
+    results_array = list()
 
     def __init__(self, directory, file_name):
         """
@@ -41,33 +47,39 @@ class HistogramGenerator:
         }
         self.histograms_hsv_dict = list()
 
-    def generate_video_rgb_histogram(self, is_query=False):
+        # keep current ROI for re-use
+        self.reference_points = list()
+
+    def generate_video_rgb_histogram(self, is_query=False, cur_ref_points=None):
         """
         Generates multiple normalized histograms (one every second) for a video.
         :param is_query: boolean specifying if the input video is the query video (to select ROI)
+        :param cur_ref_points: list of previously-used ROI point locations
         :return: None
         """
         # determine which frames to process for histograms
         frames_to_process = _get_frames_to_process(self.video_capture)
 
-        reference_points = list()
         frame_counter = 0  # keep track of current frame ID to know to process it or not
         while self.video_capture.isOpened():
             ret, frame = self.video_capture.read()  # read capture frame by frame
             if ret:
                 if is_query and frame_counter == 0:
-                    cad = ClickAndDrop(frame)
-                    if config.debug:  # show the cropped region of interest
-                        roi_frame = cad.get_roi()
-                        cv2.imshow('Selected ROI', roi_frame)
-                        cv2.waitKey(0)
-                    reference_points = cad.get_reference_points()
+                    if cur_ref_points is None:
+                        cad = ClickAndDrop(frame)
+                        if config.debug:  # show the cropped region of interest
+                            roi_frame = cad.get_roi()
+                            cv2.imshow('Selected ROI', roi_frame)
+                            cv2.waitKey(0)
+                        self.reference_points = cad.get_reference_points()
+                    else:
+                        self.reference_points = cur_ref_points
                 frame_counter += 1
                 if frame_counter in frames_to_process:
                     for i, col in enumerate(self.colours):
-                        if is_query and len(reference_points) == 2:
-                            roi = frame[reference_points[0][1]:reference_points[1][1],
-                                        reference_points[0][0]:reference_points[1][0]]
+                        if is_query and len(self.reference_points) == 2:
+                            roi = frame[self.reference_points[0][1]:self.reference_points[1][1],
+                                        self.reference_points[0][0]:self.reference_points[1][0]]
                             histogram = cv2.calcHist([roi], [i], None, [256], [0, 256])
                         else:
                             histogram = cv2.calcHist([frame], [i], None, [256], [0, 256])
@@ -98,7 +110,6 @@ class HistogramGenerator:
         # determine which frames to process for histograms
         frames_to_process = _get_frames_to_process(self.video_capture)
 
-        reference_points = list()
         frame_counter = 0  # keep track of current frame ID to know to process it or not
         while self.video_capture.isOpened():
             ret, frame = self.video_capture.read()  # read capture frame by frame
@@ -109,12 +120,12 @@ class HistogramGenerator:
                         roi_frame = cad.get_roi()
                         cv2.imshow("Selected ROI", roi_frame)
                         cv2.waitKey(0)
-                    reference_points = cad.get_reference_points()
+                    self.reference_points = cad.get_reference_points()
                 frame_counter += 1
                 if frame_counter in frames_to_process:
-                    if is_query and len(reference_points) == 2:
-                        roi = frame[reference_points[0][1]:reference_points[1][1],
-                                    reference_points[0][0]:reference_points[1][0]]
+                    if is_query and len(self.reference_points) == 2:
+                        roi = frame[self.reference_points[0][1]:self.reference_points[1][1],
+                                    self.reference_points[0][0]:self.reference_points[1][0]]
                         roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
                         histogram = cv2.calcHist([roi_gray], [0], None, [256], [0, 256])
                     else:
@@ -139,27 +150,35 @@ class HistogramGenerator:
         self.generate_and_store_average_grayscale_histogram()
         self.destroy_video_capture()
 
-    def generate_video_hsv_histogram(self, is_query=False):
+    def generate_video_hsv_histogram(self, is_query=False, cur_ref_points=None):
+        """
+        Generates multiple normalized HSV histograms (one every second) for a video.
+        :param is_query: boolean specifying if the input video is the query video (to select ROI)
+        :param cur_ref_points: list of previously-used ROI point locations
+        :return: None
+        """
         # determine which frames to process for histograms
         frames_to_process = _get_frames_to_process(self.video_capture)
 
-        reference_points = list()
         frame_counter = 0  # keep track of current frame ID to know to process it or not
         while self.video_capture.isOpened():
             ret, frame = self.video_capture.read()  # read capture frame by frame
             if ret:
                 if is_query and frame_counter == 0:
-                    cad = ClickAndDrop(frame)
-                    if config.debug:  # show the cropped region of interest
-                        roi_frame = cad.get_roi()
-                        cv2.imshow("Selected ROI", roi_frame)
-                        cv2.waitKey(0)
-                    reference_points = cad.get_reference_points()
+                    if cur_ref_points is None:
+                        cad = ClickAndDrop(frame)
+                        if config.debug:  # show the cropped region of interest
+                            roi_frame = cad.get_roi()
+                            cv2.imshow("Selected ROI", roi_frame)
+                            cv2.waitKey(0)
+                        self.reference_points = cad.get_reference_points()
+                    else:
+                        self.reference_points = cur_ref_points
                 frame_counter += 1
                 if frame_counter in frames_to_process:
-                    if is_query and len(reference_points) == 2:
-                        roi = frame[reference_points[0][1]:reference_points[1][1],
-                                    reference_points[0][0]:reference_points[1][0]]
+                    if is_query and len(self.reference_points) == 2:
+                        roi = frame[self.reference_points[0][1]:self.reference_points[1][1],
+                                    self.reference_points[0][0]:self.reference_points[1][0]]
                         roi_hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
                         histogram = cv2.calcHist([roi_hsv], [0, 1, 2], None, self.bins, [0, 180, 0, 256, 0, 256])
                     else:
@@ -279,7 +298,7 @@ class HistogramGenerator:
         plt.title("HSV histogram for '{}'".format(self.file_name))
         plt.show()
 
-    def match_histograms(self):
+    def match_histograms(self, cur_all_model='all'):
         """
         Compares the BGR histogram of the recorded video and compares it with each of the saved average BGR histograms
         using different histogram matching methods such as the Chi-Square or Bhattacharyya methods, and prints the
@@ -292,32 +311,31 @@ class HistogramGenerator:
 
         # get histogram for the recorded video to match - todo: calculate the histogram on the go
         hist_recording = dict()
-        if config.model == "gray":
+        if config.model == "gray" or (cur_all_model == "gray" and config.model == "all"):
             hist_recording = {
                 'gray': np.loadtxt("../histogram_data/{}/hist-gray".format(self.file_name), dtype=np.float32, unpack=False),
             }
-        elif config.model == "rgb":
+        elif config.model == "rgb" or (cur_all_model == "rgb" and config.model == "all"):
             hist_recording = {
                 'b': np.loadtxt("../histogram_data/{}/hist-b".format(self.file_name), dtype=np.float32, unpack=False),
                 'g': np.loadtxt("../histogram_data/{}/hist-g".format(self.file_name), dtype=np.float32, unpack=False),
                 'r': np.loadtxt("../histogram_data/{}/hist-r".format(self.file_name), dtype=np.float32, unpack=False)
             }
-        elif config.model == "hsv":
+        elif config.model == "hsv" or (cur_all_model == "hsv" and config.model == "all"):
             hsv_data = np.loadtxt("../histogram_data/{}/hist-hsv".format(self.file_name))
             hist_recording = {
                 'hsv': hsv_data.reshape((8, 12, 3))
             }
 
         # compare recorded video histogram with histogram of each video
-        print("\n{} Histogram Comparison Results:\n".format(_get_chosen_model_string()))
+        print("\n{} Histogram Comparison Results:\n".format(_get_chosen_model_string(cur_all_model)))
 
         method = ""
         field_names = ["video", "score"]
 
         # use OpenCV's compareHist function for RGB and gray scale histograms (works with 2d arrays only)
-        if config.model == "rgb" or config.model == "gray":
+        if config.model == "rgb" or config.model == "gray" or (cur_all_model == "gray" and config.model == "all") or (cur_all_model == "rgb" and config.model == "all"):
             for m in self.histcmp_methods:
-
                 if m == 0:
                     method = "CORRELATION"
                 elif m == 1:
@@ -340,10 +358,10 @@ class HistogramGenerator:
                     table_data = list()
                     for i, file in enumerate(get_video_filenames("../footage/")):
                         comparison = 0
-                        if config.model == "gray":
+                        if config.model == "gray" or (cur_all_model == "gray" and config.model == "all"):
                             hist_gray = np.loadtxt("../histogram_data/{}/hist-gray".format(file), dtype=np.float32, unpack=False)
                             comparison = cv2.compareHist(hist_recording['gray'], hist_gray, m)
-                        elif config.model == "rgb":
+                        elif config.model == "rgb" or (cur_all_model == "rgb" and config.model == "all"):
                             hist_b = np.loadtxt("../histogram_data/{}/hist-b".format(file), dtype=np.float32, unpack=False)
                             hist_g = np.loadtxt("../histogram_data/{}/hist-g".format(file), dtype=np.float32, unpack=False)
                             hist_r = np.loadtxt("../histogram_data/{}/hist-r".format(file), dtype=np.float32, unpack=False)
@@ -362,18 +380,29 @@ class HistogramGenerator:
                             video_match = file
                             video_match_value = comparison
                         else:
+                            # correlation and intersection
                             if m in [0, 2] and comparison > video_match_value:
                                 video_match = file
                                 video_match_value = comparison
+                            # chi-square, alternative chi-square, bhattacharyya and Kullback-Leibler divergence
                             elif m in [1, 3, 4, 5] and comparison < video_match_value:
                                 video_match = file
                                 video_match_value = comparison
 
-                    print_terminal_table(table_data, method)
-                    print("Match found: " + "\x1b[1;31m" + video_match + "\x1b[0m" + "\n\n")
+                # append video match found to results list (using weights)
+                if cur_all_model == "gray":
+                    for _ in range(0, self.histogram_comparison_weigths['gray'], 1):
+                        self.results_array.append(video_match + "gray")
+                elif cur_all_model == "rgb":
+                    for _ in range(0, self.histogram_comparison_weigths['rgb'], 1):
+                        self.results_array.append(video_match + "rgb")
+
+                print_terminal_table(table_data, method)
+                print("{} {} match found: ".format(_get_chosen_model_string(cur_all_model), method) +
+                      "\x1b[1;31m" + video_match + "\x1b[0m" + "\n\n")
 
         # use SciPy's statistical distances functions for HSV histograms (compareHist does not work with 3d arrays)
-        elif config.model == "hsv":
+        elif config.model == "hsv" or config.model == "all":
             for m in self.histcmp_3d_methods:
                 if m == "wasserstein_distance":
                     method = "WASSERSTEIN DISTANCE (EMD)"
@@ -415,8 +444,13 @@ class HistogramGenerator:
                                 video_match = file
                                 video_match_value = comparison
 
-                    print_terminal_table(table_data, method)
-                    print("Match found: " + "\x1b[1;31m" + video_match + "\x1b[0m" + "\n\n")
+                # append video match found to results list (using weights)
+                for _ in range(0, self.histogram_comparison_weigths['hsv']):
+                    self.results_array.append(video_match + "hsv")
+
+                print_terminal_table(table_data, method)
+                print("{} {} Match found: ".format(_get_chosen_model_string(cur_all_model), method) +
+                      "\x1b[1;31m" + video_match + "\x1b[0m" + "\n\n")
 
     def rgb_histogram_shot_boundary_detection(self):
         """
@@ -513,6 +547,20 @@ class HistogramGenerator:
         """
         return self.video_capture
 
+    def get_current_reference_points(self):
+        """
+        Returns the current ROI point locations manually selected for the first frame for future re-use.
+        :return: the ROI pixel locations retrieved from the first frame of the video
+        """
+        return self.reference_points
+
+    def get_results_array(self):
+        """
+        Returns the array with the resulting video results.
+        :return: array of strings
+        """
+        return self.results_array
+
 
 def _get_frames_to_process(vc):
     """
@@ -528,14 +576,21 @@ def _get_frames_to_process(vc):
     return frame_ids
 
 
-def _get_chosen_model_string():
+def _get_chosen_model_string(model):
     """
     Returns the Histogram Model chosen for the matching process.
     :return: a string representing the chosen histogram model
     """
-    if config.model == "gray":
+    if model == "gray":
         return "Grayscale"
-    elif config.model == "rgb":
+    elif model == "rgb":
         return "RGB"
-    elif config.model == 'hsv':
+    elif model == 'hsv':
         return "HSV"
+    else:
+        if config.model == "gray":
+            return "Grayscale"
+        elif config.model == "rgb":
+            return "RGB"
+        elif config.model == 'hsv':
+            return "HSV"
