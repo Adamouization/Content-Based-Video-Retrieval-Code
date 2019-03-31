@@ -1,6 +1,25 @@
 # Content-Based-Video-Retrieval-Code
 
-## Installation Guide
+## Usage
+
+```
+python app/main.py --model <model> --mode <mode> (--debug)
+```
+
+where:
+
+* `--model` indicates the histogram model to use. Can be "all", "gray", "rgb" or "hsv". "all" will use the 3 histogram models to train/test the system.
+* `--mode` indicates the mode to run in. Can be "train" or "test".
+* `--debug` is an optional flag. If the flag is set, additional logs will be printed for debugging purposes.
+
+Examples:
+
+* To train the system: `python app/main.py --model all --mode test`
+* To test the system: `python app/main.py --model all --mode train`
+* To train the system with RGB only: `python app/main.py --model rgb --mode train`
+* To test the system with HSV only in debug mode: `python app/main.py --model hsv --mode test --debug`
+
+## Installation
 
 * Clone the project
 ```
@@ -17,7 +36,7 @@ cd Content-Based-Video-Retrieval-Code
 
 `source ~/Environments/Content-Based-Video-Retrieval-Code/bin/activate`
 
-* Install OpenCV for Python and dependencies e.g. numpy
+* Install project dependencies
 
 `pip install -r requirements.txt`
 
