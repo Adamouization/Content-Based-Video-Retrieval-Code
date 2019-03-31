@@ -10,6 +10,8 @@ results/histogram-comparisons.xlsx
 results/csv
 results/query.png
 results/result.png
+results/output
+results/rgb-histogram-plots
 *.avi
 
 
@@ -195,38 +197,6 @@ fabric.properties
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 
-########################################################################################################################
-# Covers MATLAB files
-########################################################################################################################
-
-# Windows default autosave extension
-*.asv
-
-# OSX / *nix default autosave extension
-*.m~
-
-# Compiled MEX binaries (all platforms)
-*.mex*
-
-# Packaged app and toolbox files
-*.mlappinstall
-*.mltbx
-
-# Generated helpsearch folders
-helpsearch*/
-
-# Simulink code generation folders
-slprj/
-sccprj/
-
-# Matlab code generation folders
-codegen/
-
-# Simulink autosave extension
-*.autosave
-
-# Octave session info
-octave-workspace
 
 ########################################################################################################################
 # Covers macOS environment files
