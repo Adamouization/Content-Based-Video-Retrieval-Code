@@ -45,3 +45,13 @@ cd Content-Based-Video-Retrieval-Code
 
 * [Project Presentation](https://github.com/Adamouization/Content-Based-Video-Retrieval-Code/projects/1) (18/02/2019)
 * [Project Enhancements](https://github.com/Adamouization/Content-Based-Video-Retrieval-Code/projects/2) (07/05/2019)
+
+## License
+
+* see [LICENSE](https://github.com/Adamouization/Content-Based-Video-Retrieval-Code/blob/master/LICENSE) file
+
+## Contact
+* email: adam@jaamour.com
+* LinkedIn: [www.linkedin.com/in/adamjaamour](https://www.linkedin.com/in/adamjaamour/)
+* website: www.adam.jaamour.com
+* twitter: [@Adamouization](https://twitter.com/Adamouization)
