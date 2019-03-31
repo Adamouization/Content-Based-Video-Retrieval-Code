@@ -4,7 +4,7 @@ import time
 
 from pyspin.spin import make_spin, Spin2
 
-from app.helpers import get_video_filenames, print_finished_training_message
+from app.helpers import get_video_filenames, get_video_first_frame, print_finished_training_message, show_final_match
 from app.histogram import HistogramGenerator
 import app.config as settings
 
@@ -135,8 +135,13 @@ def test_hist_classifier():
                 if results_count[r] > final_result_count:
                     final_result_name = r
                     final_result_count = results_count[r]
+
+        # print results
         runtime = round(time.time() - start_time, 2)
         accuracy = final_result_count / len(all_results)
+        get_video_first_frame(directory + file, "../results", is_query=True)
+        get_video_first_frame("../footage/{}".format(final_result_name), "../results", is_result=True)
+        show_final_match("../results/query.png", "../results/result.png", runtime, accuracy)
         print_finished_training_message(final_result_name, settings.model, runtime, accuracy)
 
 

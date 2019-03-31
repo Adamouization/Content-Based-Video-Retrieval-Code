@@ -8,6 +8,8 @@ recordings/query.png
 recordings/train.png
 results/histogram-comparisons.xlsx
 results/csv
+results/query.png
+results/result.png
 *.avi
 
 

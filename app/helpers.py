@@ -1,5 +1,8 @@
 import os
 
+import cv2
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 from terminaltables import DoubleTable
 
 
@@ -47,3 +50,48 @@ def print_finished_training_message(answer, model, runtime, accuracy=None):
     print("\n--- Runtime: {} seconds ---".format(runtime))
     if accuracy is not None:
         print("--- Accuracy: {} % ---".format(round(accuracy * 100, 2)))
+
+
+def get_video_first_frame(video, path_output_dir, is_query=False, is_result=False):
+    """
+    Retrieves the first frame from a video and saves it as a PNG.
+    :param video: the path to the video
+    :param path_output_dir: the directory to save the frame in
+    :param is_query: write first frame for query
+    :param is_result: write first frame for matched video
+    :return: None
+    """
+    vc = cv2.VideoCapture(video)
+    frame_counter = 0
+    while vc.isOpened():
+        ret, image = vc.read()
+        if ret and frame_counter == 0:
+            if is_query:
+                cv2.imwrite(os.path.join(path_output_dir, 'query.png'), image)
+            elif is_result:
+                cv2.imwrite(os.path.join(path_output_dir, 'result.png'), image)
+            frame_counter += 1
+        else:
+            break
+    cv2.destroyAllWindows()
+    vc.release()
+
+
+def show_final_match(query_frame, result_frame, runtime, accuracy):
+    """
+    Plots the query image and the matched video.
+    :param query_frame: the query image
+    :param result_frame: the matched video's image
+    :param runtime: the time elapsed in seconds
+    :param accuracy: the accuracy of the classifier in % (True Positives / Number of Matches)
+    :return: None
+    """
+    query_img = mpimg.imread(query_frame)
+    result_img = mpimg.imread(result_frame)
+    plt.subplot(2, 1, 1)
+    plt.imshow(query_img)
+    plt.title("Original Query", fontSize=18), plt.xticks([]), plt.yticks([])
+    plt.subplot(2, 1, 2)
+    plt.imshow(result_img)
+    plt.title("Match found in {} seconds with {}% accuracy".format(runtime, round(accuracy * 100, 2)), fontSize=16), plt.xticks([]), plt.yticks([])
+    plt.show()
