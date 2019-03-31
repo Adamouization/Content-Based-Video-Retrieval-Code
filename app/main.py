@@ -141,7 +141,7 @@ def test_hist_classifier():
         accuracy = final_result_count / len(all_results)
         get_video_first_frame(directory + file, "../results", is_query=True)
         get_video_first_frame("../footage/{}".format(final_result_name), "../results", is_result=True)
-        show_final_match("../results/query.png", "../results/result.png", runtime, accuracy)
+        show_final_match(final_result_name, "../results/query.png", "../results/result.png", runtime, accuracy)
         print_finished_training_message(final_result_name, settings.model, runtime, accuracy)
 
 

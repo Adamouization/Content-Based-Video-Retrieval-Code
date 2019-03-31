@@ -77,9 +77,10 @@ def get_video_first_frame(video, path_output_dir, is_query=False, is_result=Fals
     vc.release()
 
 
-def show_final_match(query_frame, result_frame, runtime, accuracy):
+def show_final_match(result_name, query_frame, result_frame, runtime, accuracy):
     """
     Plots the query image and the matched video.
+    :param result_name: the name of the matched video
     :param query_frame: the query image
     :param result_frame: the matched video's image
     :param runtime: the time elapsed in seconds
@@ -90,8 +91,12 @@ def show_final_match(query_frame, result_frame, runtime, accuracy):
     result_img = mpimg.imread(result_frame)
     plt.subplot(2, 1, 1)
     plt.imshow(query_img)
-    plt.title("Original Query", fontSize=18), plt.xticks([]), plt.yticks([])
+    plt.title("Original Query Video", fontSize=16), plt.xticks([]), plt.yticks([])
     plt.subplot(2, 1, 2)
     plt.imshow(result_img)
-    plt.title("Match found in {} seconds with {}% accuracy".format(runtime, round(accuracy * 100, 2)), fontSize=16), plt.xticks([]), plt.yticks([])
+    plt.title(
+        "Match '{}' found in {}s with {}% accuracy".format(result_name, runtime, round(accuracy * 100, 2)),
+        fontSize=13)
+    plt.xticks([])
+    plt.yticks([])
     plt.show()
