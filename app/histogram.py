@@ -350,7 +350,10 @@ class HistogramGenerator:
                     method = "KULLBACK-LEIBLER DIVERGENCE"
 
                 # CSV file to write data to for each method
-                csv_file = open('../results/csv/{}-{}.csv'.format(config.model, method), 'w')
+                if config.model == "all":
+                    csv_file = open('../results/csv/{}-{}-{}.csv'.format(config.model, cur_all_model, method), 'w')
+                else:
+                    csv_file = open('../results/csv/{}-{}.csv'.format(config.model, method), 'w')
                 with csv_file:
                     writer = csv.DictWriter(csv_file, fieldnames=field_names)
                     writer.writeheader()
@@ -410,7 +413,10 @@ class HistogramGenerator:
                     method = "ENERGY DISTANCE"
 
                 # CSV file to write data to for each method
-                csv_file = open('../results/csv/{}-{}.csv'.format(config.model, method), 'w')
+                if config.model == "all":
+                    csv_file = open('../results/csv/{}-{}-{}.csv'.format(config.model, cur_all_model, method), 'w')
+                else:
+                    csv_file = open('../results/csv/{}-{}.csv'.format(config.model, method), 'w')
                 with csv_file:
 
                     writer = csv.DictWriter(csv_file, fieldnames=field_names)
