@@ -22,12 +22,16 @@ def main():
                         required=True,
                         help="The mode to run the code in. Choose from the following options: 'train', 'test' or "
                              "'segment'.")
+    parser.add_argument("--showhists",
+                        action="store_true",
+                        help="Specify whether you want to display each generated histogram.")
     parser.add_argument("-d", "--debug",
                         action="store_true",
                         help="Specify whether you want to print additional logs for debugging purposes.")
     args = parser.parse_args()
     settings.debug = args.debug
     settings.mode = args.mode
+    settings.show_histograms = args.showhists
     settings.model = args.model
 
     if settings.mode == 'train':
@@ -81,8 +85,8 @@ def test_hist_classifier():
     :return: None
     """
     directory = "../recordings/"
-    recordings = ["recording1.mp4", "recording2.mp4", "recording3.mp4"]  # 1: cloud-sky, 2: seal, 3: butterfly
-    file = recordings[0]
+    recordings = ["recording1.mp4", "recording2.mp4", "recording3.mp4", "recording4.mp4"]
+    file = recordings[3]  # 0: cloudy-sky, 1: seal, 2: butterfly, 3: wind-turbine
 
     print("\nPlease crop the recorded video for the histogram to be generated.")
 

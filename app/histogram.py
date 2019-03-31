@@ -7,8 +7,8 @@ from matplotlib import pyplot as plt
 import numpy as np
 from scipy.stats import energy_distance, wasserstein_distance
 
-from app.helpers import get_video_filenames, print_terminal_table
 import app.config as config
+from app.helpers import get_video_filenames, print_terminal_table
 from app.video_operations import ClickAndDrop
 
 
@@ -223,11 +223,13 @@ class HistogramGenerator:
             if not os.path.exists("../histogram_data/{}/".format(self.file_name)):
                 os.makedirs("../histogram_data/{}/".format(self.file_name))
             np.savetxt("../histogram_data/{}/hist-{}".format(self.file_name, col), avg_histogram, fmt='%f')
-            plt.plot(avg_histogram, color=col)
-            plt.xlim([0, 256])
-        plt.title("RGB histogram for '{}'".format(self.file_name))
-        plt.xlabel("Bins")
-        plt.show()
+            if config.show_histograms:
+                plt.plot(avg_histogram, color=col)
+                plt.xlim([0, 256])
+        if config.show_histograms:
+            plt.title("RGB histogram for '{}'".format(self.file_name))
+            plt.xlabel("Bins")
+            plt.show()
 
     def generate_and_store_average_grayscale_histogram(self):
         """
@@ -255,11 +257,12 @@ class HistogramGenerator:
         if not os.path.exists("../histogram_data/{}/".format(self.file_name)):
             os.makedirs("../histogram_data/{}/".format(self.file_name))
         np.savetxt("../histogram_data/{}/hist-{}".format(self.file_name, col), avg_histogram, fmt='%f')
-        plt.plot(avg_histogram, color=col)
-        plt.xlim([0, 256])
-        plt.title("Grayscale histogram for '{}'".format(self.file_name))
-        plt.xlabel("Bins")
-        plt.show()
+        if config.show_histograms:
+            plt.plot(avg_histogram, color=col)
+            plt.xlim([0, 256])
+            plt.title("Grayscale histogram for '{}'".format(self.file_name))
+            plt.xlabel("Bins")
+            plt.show()
 
     def generate_and_store_average_hsv_histogram(self):
         """
@@ -294,9 +297,10 @@ class HistogramGenerator:
                 np.savetxt(file, arr_2d)
                 file.write("# New slice\n")
 
-        plt.imshow(avg_histogram)
-        plt.title("HSV histogram for '{}'".format(self.file_name))
-        plt.show()
+        if config.show_histograms:
+            plt.imshow(avg_histogram)
+            plt.title("HSV histogram for '{}'".format(self.file_name))
+            plt.show()
 
     def match_histograms(self, cur_all_model='all'):
         """
