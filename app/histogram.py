@@ -21,7 +21,7 @@ class HistogramGenerator:
     histogram_comparison_weigths = {  # weights per comparison methods
         'gray': 1,
         'rgb': 5,
-        'hsv': 8
+        'hsv': 10
     }
     results_array = list()
 
