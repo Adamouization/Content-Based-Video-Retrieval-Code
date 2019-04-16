@@ -83,7 +83,7 @@ class HistogramGenerator:
                             histogram = cv2.calcHist([roi], [i], None, [256], [0, 256])
                         else:
                             histogram = cv2.calcHist([frame], [i], None, [256], [0, 256])
-                        histogram = cv2.normalize(histogram, histogram)
+                        histogram = _normalize_histogram(histogram)
                         self.histograms_rgb_dict[col].append(histogram)
                         if config.debug:  # show individual BGR histogram plots
                             print("i: {}, col: {}".format(i, col))
@@ -131,7 +131,7 @@ class HistogramGenerator:
                     else:
                         gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                         histogram = cv2.calcHist([gray_frame], [0], None, [256], [0, 256])
-                    histogram = cv2.normalize(histogram, histogram)
+                    histogram = _normalize_histogram(histogram)
                     self.histograms_gray_dict.append(histogram)
                     if config.debug:  # show individual grayscale histogram plots
                         plt.figure()
@@ -184,7 +184,7 @@ class HistogramGenerator:
                     else:
                         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
                         histogram = cv2.calcHist([hsv_frame], [0, 1, 2], None, self.bins, [0, 180, 0, 256, 0, 256])
-                    histogram = cv2.normalize(histogram, histogram)
+                    histogram = _normalize_histogram(histogram)
                     self.histograms_hsv_dict.append(histogram)
                     if config.debug:  # show individual HSV histogram plots
                         plt.imshow(histogram)
@@ -498,8 +498,8 @@ class HistogramGenerator:
                     prev_frame_hist = cv2.calcHist([prev_frame], [i], None, [256], [0, 256])
 
                     # normalize histograms
-                    cur_frame_hist = cv2.normalize(cur_frame_hist, cur_frame_hist)
-                    prev_frame_hist = cv2.normalize(prev_frame_hist, prev_frame_hist)
+                    cur_frame_hist = _normalize_histogram(cur_frame_hist)
+                    prev_frame_hist = _normalize_histogram(prev_frame_hist)
 
                     # save histograms in dict
                     cur_rgb_hist[col].append(cur_frame_hist)
@@ -570,6 +570,16 @@ class HistogramGenerator:
         :return: array of strings
         """
         return self.results_array
+
+
+def _normalize_histogram(hist):
+    """
+    Normalize a histogram using OpenCV's "normalize: function
+    :param hist: the histogram to normalize
+    :return: the normalized histogram
+    """
+    hist = cv2.normalize(hist, hist)
+    return hist
 
 
 def _get_frames_to_process(vc):
