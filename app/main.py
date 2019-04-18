@@ -6,7 +6,7 @@ from pyspin.spin import make_spin, Spin2
 
 from app.helpers import get_video_filenames, get_video_first_frame, print_finished_training_message, show_final_match
 from app.histogram import HistogramGenerator
-import app.config as settings
+import app.config as config
 
 
 def main():
@@ -29,23 +29,23 @@ def main():
                         action="store_true",
                         help="Specify whether you want to print additional logs for debugging purposes.")
     args = parser.parse_args()
-    settings.debug = args.debug
-    settings.mode = args.mode
-    settings.show_histograms = args.showhists
-    settings.model = args.model
+    config.debug = args.debug
+    config.mode = args.mode
+    config.show_histograms = args.showhists
+    config.model = args.model
 
-    if settings.mode == "train":
+    if config.mode == "train":
         train_hist_classifier()
-    elif settings.mode == "test":
+    elif config.mode == "test":
         test_hist_classifier()
-    elif settings.mode == "segment":
+    elif config.mode == "segment":
         segment_video()
     else:
         print("Wrong mode chosen. Choose from the following options: 'train', 'test' or 'segment'.")
         exit(0)
 
 
-@make_spin(Spin2, "Generating histograms...".format(settings.model))
+@make_spin(Spin2, "Generating histograms...".format(config.model))
 def train_hist_classifier():
     """
     Generates an averaged BGR histogram for all the videos in the directory-based database.
@@ -58,13 +58,13 @@ def train_hist_classifier():
     start_time = time.time()
 
     for file in files:
-        if settings.model == "gray":
+        if config.model == "gray":
             histogram_generator = HistogramGenerator(directory, file)
             histogram_generator.generate_video_greyscale_histogram()
-        elif settings.model == "rgb":
+        elif config.model == "rgb":
             histogram_generator = HistogramGenerator(directory, file)
             histogram_generator.generate_video_rgb_histogram()
-        elif settings.model == "hsv":
+        elif config.model == "hsv":
             histogram_generator = HistogramGenerator(directory, file)
             histogram_generator.generate_video_hsv_histogram()
         else:
@@ -75,7 +75,7 @@ def train_hist_classifier():
             histogram_generator_hsv = HistogramGenerator(directory, file)
             histogram_generator_hsv.generate_video_hsv_histogram()
     runtime = round(time.time() - start_time, 2)
-    print_finished_training_message(settings.model, directory, runtime)
+    print_finished_training_message(config.model, directory, runtime)
 
 
 def test_hist_classifier():
@@ -90,15 +90,15 @@ def test_hist_classifier():
 
     print("\nPlease crop the recorded video for the histogram to be generated.")
 
-    if settings.model == "gray":
+    if config.model == "gray":
         histogram_generator = HistogramGenerator(directory, file)
         histogram_generator.generate_video_greyscale_histogram(is_query=True)
         histogram_generator.match_histograms()
-    elif settings.model == "rgb":
+    elif config.model == "rgb":
         histogram_generator = HistogramGenerator(directory, file)
         histogram_generator.generate_video_rgb_histogram(is_query=True)
         histogram_generator.match_histograms()
-    elif settings.model == "hsv":
+    elif config.model == "hsv":
         histogram_generator = HistogramGenerator(directory, file)
         histogram_generator.generate_video_hsv_histogram(is_query=True)
         histogram_generator.match_histograms()
@@ -146,7 +146,7 @@ def test_hist_classifier():
         get_video_first_frame(directory + file, "../results", is_query=True)
         get_video_first_frame("../footage/{}".format(final_result_name), "../results", is_result=True)
         show_final_match(final_result_name, "../results/query.png", "../results/result.png", runtime, accuracy)
-        print_finished_training_message(final_result_name, settings.model, runtime, accuracy)
+        print_finished_training_message(final_result_name, config.model, runtime, accuracy)
 
 
 def segment_video():
