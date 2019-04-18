@@ -480,6 +480,7 @@ class HistogramGenerator:
         ret, frame = self.video_capture.read()  # get initial frame
 
         frame_counter = 0  # keep track of current frame ID to locate shot boundaries
+        scene_change_counter = 0  # keep track of the number of shot changes detected
         while self.video_capture.isOpened():
             prev_frame = frame[:]  # previous frame
             ret, frame = self.video_capture.read()  # read capture frame by frame
@@ -520,6 +521,7 @@ class HistogramGenerator:
                 y_axis.append(comparison)
 
                 if comparison > threshold and is_under_threshold:
+                    scene_change_counter += 1
                     is_under_threshold = False
                     print("Scene Change detected at Frame {}".format(frame_counter))
                 elif comparison < threshold:
@@ -535,6 +537,7 @@ class HistogramGenerator:
         plt.xlabel("Frame")
         plt.ylabel("KL Divergence")
         plt.show()
+        print("\nTotal number of shot changes detected: {}".format(scene_change_counter))
 
         self.destroy_video_capture()
 
