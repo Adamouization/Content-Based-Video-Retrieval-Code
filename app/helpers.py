@@ -69,9 +69,9 @@ def get_video_first_frame(video, path_output_dir, is_query=False, is_result=Fals
         ret, image = vc.read()
         if ret and frame_counter == 0:
             if is_query:
-                cv2.imwrite(os.path.join(path_output_dir, 'query.png'), image)
+                cv2.imwrite(os.path.join(path_output_dir, "query.png"), image)
             elif is_result:
-                cv2.imwrite(os.path.join(path_output_dir, 'result.png'), image)
+                cv2.imwrite(os.path.join(path_output_dir, "result.png"), image)
             frame_counter += 1
         else:
             break

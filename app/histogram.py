@@ -69,7 +69,7 @@ class HistogramGenerator:
                         cad = ClickAndDrop(frame)
                         if config.debug:  # show the cropped region of interest
                             roi_frame = cad.get_roi()
-                            cv2.imshow('Selected ROI', roi_frame)
+                            cv2.imshow("Selected ROI", roi_frame)
                             cv2.waitKey(0)
                         self.reference_points = cad.get_reference_points()
                     else:
@@ -306,7 +306,7 @@ class HistogramGenerator:
             plt.title("HSV histogram for '{}'".format(self.file_name))
             plt.show()
 
-    def match_histograms(self, cur_all_model='all'):
+    def match_histograms(self, cur_all_model="all"):
         """
         Compares the BGR histogram of the recorded video and compares it with each of the saved average BGR histograms
         using different histogram matching methods such as the Chi-Square or Bhattacharyya methods, and prints the
@@ -359,9 +359,9 @@ class HistogramGenerator:
 
                 # CSV file to write data to for each method
                 if config.model == "all":
-                    csv_file = open('../results/csv/{}-{}-{}.csv'.format(config.model, cur_all_model, method), 'w')
+                    csv_file = open("../results/csv/{}-{}-{}.csv".format(config.model, cur_all_model, method), 'w')
                 else:
-                    csv_file = open('../results/csv/{}-{}.csv'.format(config.model, method), 'w')
+                    csv_file = open("../results/csv/{}-{}.csv".format(config.model, method), 'w')
                 with csv_file:
                     writer = csv.DictWriter(csv_file, fieldnames=field_names)
                     writer.writeheader()
@@ -385,7 +385,7 @@ class HistogramGenerator:
                         table_data.append([file, round(comparison, 5)])
 
                         # write data to CSV file
-                        writer.writerow({'video': file, 'score': round(comparison, 5)})
+                        writer.writerow({"video": file, "score": round(comparison, 5)})
 
                         if i == 0:
                             video_match = file
@@ -422,9 +422,9 @@ class HistogramGenerator:
 
                 # CSV file to write data to for each method
                 if config.model == "all":
-                    csv_file = open('../results/csv/{}-{}-{}.csv'.format(config.model, cur_all_model, method), 'w')
+                    csv_file = open("../results/csv/{}-{}-{}.csv".format(config.model, cur_all_model, method), 'w')
                 else:
-                    csv_file = open('../results/csv/{}-{}.csv'.format(config.model, method), 'w')
+                    csv_file = open("../results/csv/{}-{}.csv".format(config.model, method), 'w')
                 with csv_file:
 
                     writer = csv.DictWriter(csv_file, fieldnames=field_names)
@@ -448,7 +448,7 @@ class HistogramGenerator:
                         table_data.append([file, round(comparison, 5)])
 
                         # write data to CSV file
-                        writer.writerow({'video': file, 'score': round(comparison, 5)})
+                        writer.writerow({"video": file, "score": round(comparison, 5)})
 
                         if i == 0:
                             video_match = file
@@ -612,12 +612,12 @@ def _get_chosen_model_string(model):
         return "Greyscale"
     elif model == "rgb":
         return "RGB"
-    elif model == 'hsv':
+    elif model == "hsv":
         return "HSV"
     else:
         if config.model == "gray":
             return "Greyscale"
         elif config.model == "rgb":
             return "RGB"
-        elif config.model == 'hsv':
+        elif config.model == "hsv":
             return "HSV"

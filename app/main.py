@@ -34,11 +34,11 @@ def main():
     settings.show_histograms = args.showhists
     settings.model = args.model
 
-    if settings.mode == 'train':
+    if settings.mode == "train":
         train_hist_classifier()
-    elif settings.mode == 'test':
+    elif settings.mode == "test":
         test_hist_classifier()
-    elif settings.mode == 'segment':
+    elif settings.mode == "segment":
         segment_video()
     else:
         print("Wrong mode chosen. Choose from the following options: 'train', 'test' or 'segment'.")
