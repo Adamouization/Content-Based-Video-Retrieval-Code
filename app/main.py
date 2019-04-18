@@ -4,7 +4,8 @@ import time
 
 from pyspin.spin import make_spin, Spin2
 
-from app.helpers import get_video_filenames, get_video_first_frame, print_finished_training_message, show_final_match
+from app.helpers import get_number_of_frames, get_video_filenames, get_video_fps, get_video_first_frame, \
+    print_finished_training_message, show_final_match
 from app.histogram import HistogramGenerator
 import app.config as config
 
@@ -154,15 +155,23 @@ def segment_video():
     video = "scene-segmentation.mp4"
 
     shot_boundary_detector = HistogramGenerator(directory, video)
+    video_capture = shot_boundary_detector.get_video_capture()
+    frame_count = get_number_of_frames(vc=video_capture)
+    fps = get_video_fps(vc=video_capture)
+    print("Total Frames: {}".format(frame_count))
+    print("FPS: {}\n".format(fps))
 
     # start measuring runtime
     start_time = time.time()
 
+    # start analysing video
+    print("Starting to process video for shot boundary detection...")
     shot_boundary_detector.rgb_histogram_shot_boundary_detection()
-    print("\nFinished detecting shot boundaries for {}.".format(video))
 
+    # print final results
     runtime = round(time.time() - start_time, 2)
-    print("\n--- Runtime: {} seconds ---".format(runtime))
+    print("--- Number of frames in video: {} ---".format(frame_count))
+    print("--- Runtime: {} seconds ---".format(runtime))
 
 
 if __name__ == "__main__":

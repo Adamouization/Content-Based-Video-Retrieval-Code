@@ -537,7 +537,7 @@ class HistogramGenerator:
         plt.xlabel("Frame")
         plt.ylabel("KL Divergence")
         plt.show()
-        print("\nTotal number of shot changes detected: {}".format(scene_change_counter))
+        print("\n--- Number of shot changes detected: {} ---".format(scene_change_counter))
 
         self.destroy_video_capture()
 

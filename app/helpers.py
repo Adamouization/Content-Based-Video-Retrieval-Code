@@ -102,3 +102,23 @@ def show_final_match(result_name, query_frame, result_frame, runtime, accuracy):
     plt.xticks([])
     plt.yticks([])
     plt.show()
+
+
+def get_number_of_frames(vc):
+    """
+    Retrieves the total number of frames in a video using OpenCV's VideoCapture object cv2.CAP_PROP_FRAME_COUNT
+    attribute.
+    :param vc: the video capture
+    :return: the number of frames in the video capture
+    """
+    return int(vc.get(cv2.CAP_PROP_FRAME_COUNT))
+
+
+def get_video_fps(vc):
+    """
+    Retrieves the frame rate (Frames Per Second) of a video using OpenCV's VideoCapture object cv2.CAP_PROP_FPS
+    attribute.
+    :param vc: the video capture
+    :return: the video capture's FPS
+    """
+    return round(vc.get(cv2.CAP_PROP_FPS), 2)
