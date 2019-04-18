@@ -38,8 +38,8 @@ class HistogramGenerator:
         self.video_capture = cv2.VideoCapture("{}{}".format(self.directory, self.file_name))
         self.check_video_capture()
 
-        # read the video and store the histograms for each frame per color channel in a dict
-        self.histograms_gray_dict = list()
+        # read the video and store the histograms for each frame per colour channel in a dict
+        self.histograms_grey_dict = list()
         self.histograms_rgb_dict = {
             'b': list(),
             'g': list(),
@@ -52,7 +52,7 @@ class HistogramGenerator:
 
     def generate_video_rgb_histogram(self, is_query=False, cur_ref_points=None):
         """
-        Generates multiple normalized histograms (one every second) for a video.
+        Generates multiple normalised histograms (one every second) for a video.
         :param is_query: boolean specifying if the input video is the query video (to select ROI)
         :param cur_ref_points: list of previously-used ROI point locations
         :return: None
@@ -83,7 +83,7 @@ class HistogramGenerator:
                             histogram = cv2.calcHist([roi], [i], None, [256], [0, 256])
                         else:
                             histogram = cv2.calcHist([frame], [i], None, [256], [0, 256])
-                        histogram = _normalize_histogram(histogram)
+                        histogram = _normalise_histogram(histogram)
                         self.histograms_rgb_dict[col].append(histogram)
                         if config.debug:  # show individual BGR histogram plots
                             print("i: {}, col: {}".format(i, col))
@@ -101,9 +101,9 @@ class HistogramGenerator:
         self.generate_and_store_average_rgb_histogram()
         self.destroy_video_capture()
 
-    def generate_video_grayscale_histogram(self, is_query=False):
+    def generate_video_greyscale_histogram(self, is_query=False):
         """
-        Generates multiple normalized grayscale histograms (one every second) for a video.
+        Generates multiple normalised greyscale histograms (one every second) for a video.
         :param is_query: boolean specifying if the input video is the query video (to select ROI)
         :return: None
         """
@@ -126,14 +126,14 @@ class HistogramGenerator:
                     if is_query and len(self.reference_points) == 2:
                         roi = frame[self.reference_points[0][1]:self.reference_points[1][1],
                                     self.reference_points[0][0]:self.reference_points[1][0]]
-                        roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-                        histogram = cv2.calcHist([roi_gray], [0], None, [256], [0, 256])
+                        roi_grey = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+                        histogram = cv2.calcHist([roi_grey], [0], None, [256], [0, 256])
                     else:
-                        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                        histogram = cv2.calcHist([gray_frame], [0], None, [256], [0, 256])
-                    histogram = _normalize_histogram(histogram)
-                    self.histograms_gray_dict.append(histogram)
-                    if config.debug:  # show individual grayscale histogram plots
+                        grey_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                        histogram = cv2.calcHist([grey_frame], [0], None, [256], [0, 256])
+                    histogram = _normalise_histogram(histogram)
+                    self.histograms_grey_dict.append(histogram)
+                    if config.debug:  # show individual greyscale histogram plots
                         plt.figure()
                         plt.title("{} frame {}".format(self.file_name, frame_counter))
                         plt.xlabel("Bins")
@@ -147,12 +147,12 @@ class HistogramGenerator:
                         break
             else:
                 break
-        self.generate_and_store_average_grayscale_histogram()
+        self.generate_and_store_average_greyscale_histogram()
         self.destroy_video_capture()
 
     def generate_video_hsv_histogram(self, is_query=False, cur_ref_points=None):
         """
-        Generates multiple normalized HSV histograms (one every second) for a video.
+        Generates multiple normalised HSV histograms (one every second) for a video.
         :param is_query: boolean specifying if the input video is the query video (to select ROI)
         :param cur_ref_points: list of previously-used ROI point locations
         :return: None
@@ -184,7 +184,7 @@ class HistogramGenerator:
                     else:
                         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
                         histogram = cv2.calcHist([hsv_frame], [0, 1, 2], None, self.bins, [0, 180, 0, 256, 0, 256])
-                    histogram = _normalize_histogram(histogram)
+                    histogram = _normalise_histogram(histogram)
                     self.histograms_hsv_dict.append(histogram)
                     if config.debug:  # show individual HSV histogram plots
                         plt.imshow(histogram)
@@ -233,7 +233,7 @@ class HistogramGenerator:
             plt.xlabel("Bins")
             plt.show()
 
-    def generate_and_store_average_grayscale_histogram(self):
+    def generate_and_store_average_greyscale_histogram(self):
         """
         Generates a single BGR histogram by averaging all histograms of a video before writing the results to a txt
         file.
@@ -242,7 +242,7 @@ class HistogramGenerator:
         avg_histogram = np.zeros(shape=(255, 1))  # array to store average histogram values
 
         col = "gray"
-        hist = self.histograms_gray_dict
+        hist = self.histograms_grey_dict
 
         for i in range(0, 255):  # loop through all bins
             bin_sum = 0
@@ -264,7 +264,7 @@ class HistogramGenerator:
         if config.show_histograms:
             plt.plot(avg_histogram, color=col)
             plt.xlim([0, 256])
-            plt.title("Grayscale histogram for '{}'".format(self.file_name))
+            plt.title("Greyscale histogram for '{}'".format(self.file_name))
             plt.xlabel("Bins")
             plt.show()
 
@@ -341,7 +341,7 @@ class HistogramGenerator:
         method = ""
         field_names = ["video", "score"]
 
-        # use OpenCV's compareHist function for RGB and gray scale histograms (works with 2d arrays only)
+        # use OpenCV's compareHist function for RGB and greyscale histograms (works with 2d arrays only)
         if config.model == "rgb" or config.model == "gray" or (cur_all_model == "gray" and config.model == "all") or (cur_all_model == "rgb" and config.model == "all"):
             for m in self.histcmp_methods:
                 if m == 0:
@@ -370,8 +370,8 @@ class HistogramGenerator:
                     for i, file in enumerate(get_video_filenames("../footage/")):
                         comparison = 0
                         if config.model == "gray" or (cur_all_model == "gray" and config.model == "all"):
-                            hist_gray = np.loadtxt("../histogram_data/{}/hist-gray".format(file), dtype=np.float32, unpack=False)
-                            comparison = cv2.compareHist(hist_recording['gray'], hist_gray, m)
+                            hist_grey = np.loadtxt("../histogram_data/{}/hist-gray".format(file), dtype=np.float32, unpack=False)
+                            comparison = cv2.compareHist(hist_recording['gray'], hist_grey, m)
                         elif config.model == "rgb" or (cur_all_model == "rgb" and config.model == "all"):
                             hist_b = np.loadtxt("../histogram_data/{}/hist-b".format(file), dtype=np.float32, unpack=False)
                             hist_g = np.loadtxt("../histogram_data/{}/hist-g".format(file), dtype=np.float32, unpack=False)
@@ -501,9 +501,9 @@ class HistogramGenerator:
                     cur_frame_hist = cv2.calcHist([frame], [i], None, [256], [0, 256])
                     prev_frame_hist = cv2.calcHist([prev_frame], [i], None, [256], [0, 256])
 
-                    # normalize histograms
-                    cur_frame_hist = _normalize_histogram(cur_frame_hist)
-                    prev_frame_hist = _normalize_histogram(prev_frame_hist)
+                    # normalise histograms
+                    cur_frame_hist = _normalise_histogram(cur_frame_hist)
+                    prev_frame_hist = _normalise_histogram(prev_frame_hist)
 
                     # save histograms in dict
                     cur_rgb_hist[col].append(cur_frame_hist)
@@ -576,11 +576,11 @@ class HistogramGenerator:
         return self.results_array
 
 
-def _normalize_histogram(hist):
+def _normalise_histogram(hist):
     """
-    Normalize a histogram using OpenCV's "normalize: function
-    :param hist: the histogram to normalize
-    :return: the normalized histogram
+    Normalise a histogram using OpenCV's "normalise: function
+    :param hist: the histogram to normalise
+    :return: the normalised histogram
     """
     hist = cv2.normalize(hist, hist)
     return hist
@@ -606,14 +606,14 @@ def _get_chosen_model_string(model):
     :return: a string representing the chosen histogram model
     """
     if model == "gray":
-        return "Grayscale"
+        return "Greyscale"
     elif model == "rgb":
         return "RGB"
     elif model == 'hsv':
         return "HSV"
     else:
         if config.model == "gray":
-            return "Grayscale"
+            return "Greyscale"
         elif config.model == "rgb":
             return "RGB"
         elif config.model == 'hsv':

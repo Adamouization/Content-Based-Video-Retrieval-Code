@@ -60,7 +60,7 @@ def train_hist_classifier():
     for file in files:
         if settings.model == "gray":
             histogram_generator = HistogramGenerator(directory, file)
-            histogram_generator.generate_video_grayscale_histogram()
+            histogram_generator.generate_video_greyscale_histogram()
         elif settings.model == "rgb":
             histogram_generator = HistogramGenerator(directory, file)
             histogram_generator.generate_video_rgb_histogram()
@@ -69,7 +69,7 @@ def train_hist_classifier():
             histogram_generator.generate_video_hsv_histogram()
         else:
             histogram_generator_gray = HistogramGenerator(directory, file)
-            histogram_generator_gray.generate_video_grayscale_histogram()
+            histogram_generator_gray.generate_video_greyscale_histogram()
             histogram_generator_rgb = HistogramGenerator(directory, file)
             histogram_generator_rgb.generate_video_rgb_histogram()
             histogram_generator_hsv = HistogramGenerator(directory, file)
@@ -92,7 +92,7 @@ def test_hist_classifier():
 
     if settings.model == "gray":
         histogram_generator = HistogramGenerator(directory, file)
-        histogram_generator.generate_video_grayscale_histogram(is_query=True)
+        histogram_generator.generate_video_greyscale_histogram(is_query=True)
         histogram_generator.match_histograms()
     elif settings.model == "rgb":
         histogram_generator = HistogramGenerator(directory, file)
@@ -106,7 +106,7 @@ def test_hist_classifier():
         # calculate query histogram
         # gray scale
         histogram_generator_gray = HistogramGenerator(directory, file)
-        histogram_generator_gray.generate_video_grayscale_histogram(is_query=True)
+        histogram_generator_gray.generate_video_greyscale_histogram(is_query=True)
         cur_reference_points = histogram_generator_gray.get_current_reference_points()
         # RGB
         histogram_generator_rgb = HistogramGenerator(directory, file)
