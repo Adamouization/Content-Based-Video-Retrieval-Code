@@ -466,13 +466,14 @@ class HistogramGenerator:
                 print("{} {} Match found: ".format(_get_chosen_model_string(cur_all_model), method) +
                       "\x1b[1;31m" + video_match + "\x1b[0m" + "\n\n")
 
-    def rgb_histogram_shot_boundary_detection(self):
+    def rgb_histogram_shot_boundary_detection(self, threshold):
         """
-        Compares consecutive frames' RGB histograms using the Kullback-Leibler Divergence metric. If the metric is
-        bigger than the specified threshold, then a shot boundary has been detected.
+        Compares consecutive frames' RGB histograms using the Kullback-Leibler Divergence metric using a global
+        threshold approach. If the metric is bigger than the specified threshold, then a shot boundary has been
+        detected.
+        :param threshold: integer specifying the global threshold for the algorithm
         :return: None
         """
-        threshold = 10
         x_axis = list()
         y_axis = list()
         is_under_threshold = True

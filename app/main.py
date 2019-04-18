@@ -151,8 +151,11 @@ def test_hist_classifier():
 
 
 def segment_video():
-    directory = "../recordings/"
-    video = "scene-segmentation.mp4"
+    # directory = "../recordings/"
+    # video = "scene-segmentation.mp4"
+    directory = "/Volumes/ADAM2/"
+    movies = ["Inception (2010).mp4"]
+    video = movies[0]
 
     shot_boundary_detector = HistogramGenerator(directory, video)
     video_capture = shot_boundary_detector.get_video_capture()
@@ -164,9 +167,9 @@ def segment_video():
     # start measuring runtime
     start_time = time.time()
 
-    # start analysing video
+    # start processing video for shout boundary detection
     print("Starting to process video for shot boundary detection...")
-    shot_boundary_detector.rgb_histogram_shot_boundary_detection()
+    shot_boundary_detector.rgb_histogram_shot_boundary_detection(threshold=10)
 
     # print final results
     runtime = round(time.time() - start_time, 2)
