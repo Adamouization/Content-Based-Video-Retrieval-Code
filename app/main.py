@@ -154,8 +154,15 @@ def segment_video():
     video = "scene-segmentation.mp4"
 
     shot_boundary_detector = HistogramGenerator(directory, video)
+
+    # start measuring runtime
+    start_time = time.time()
+
     shot_boundary_detector.rgb_histogram_shot_boundary_detection()
-    print("Finished detecting shot boundaries for {}.".format(video))
+    print("\nFinished detecting shot boundaries for {}.".format(video))
+
+    runtime = round(time.time() - start_time, 2)
+    print("\n--- Runtime: {} seconds ---".format(runtime))
 
 
 if __name__ == "__main__":
