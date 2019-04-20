@@ -38,7 +38,7 @@ class HistogramGenerator:
         self.video_capture = cv2.VideoCapture("{}{}".format(self.directory, self.file_name))
         self.check_video_capture()
 
-        # read the video and store the histograms for each frame per colour channel in a dict
+        # dicts of lists to store histograms for each frame
         self.histograms_grey_dict = list()
         self.histograms_rgb_dict = {
             'b': list(),
@@ -83,7 +83,6 @@ class HistogramGenerator:
                             histogram = cv2.calcHist([roi], [i], None, [256], [0, 256])
                         else:
                             histogram = cv2.calcHist([frame], [i], None, [256], [0, 256])
-                        histogram = _normalise_histogram(histogram)
                         self.histograms_rgb_dict[col].append(histogram)
                         if config.debug:  # show individual BGR histogram plots
                             print("i: {}, col: {}".format(i, col))
@@ -131,7 +130,6 @@ class HistogramGenerator:
                     else:
                         grey_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                         histogram = cv2.calcHist([grey_frame], [0], None, [256], [0, 256])
-                    histogram = _normalise_histogram(histogram)
                     self.histograms_grey_dict.append(histogram)
                     if config.debug:  # show individual greyscale histogram plots
                         plt.figure()
@@ -184,7 +182,6 @@ class HistogramGenerator:
                     else:
                         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
                         histogram = cv2.calcHist([hsv_frame], [0, 1, 2], None, self.bins, [0, 180, 0, 256, 0, 256])
-                    histogram = _normalise_histogram(histogram)
                     self.histograms_hsv_dict.append(histogram)
                     if config.debug:  # show individual HSV histogram plots
                         plt.imshow(histogram)
@@ -220,6 +217,7 @@ class HistogramGenerator:
                 new_bin_value = bin_sum / len(hists)
                 avg_histogram[i] = new_bin_value
 
+            avg_histogram = _normalise_histogram(avg_histogram)
             if not os.path.exists("../histogram_data/{}/".format(self.file_name)):
                 os.makedirs("../histogram_data/{}/".format(self.file_name))
             with open("../histogram_data/{}/hist-{}".format(self.file_name, col), 'w') as file:
@@ -256,6 +254,7 @@ class HistogramGenerator:
             new_bin_value = bin_sum / len(hist)
             avg_histogram[i] = new_bin_value
 
+        avg_histogram = _normalise_histogram(avg_histogram)
         if not os.path.exists("../histogram_data/{}/".format(self.file_name)):
             os.makedirs("../histogram_data/{}/".format(self.file_name))
         with open("../histogram_data/{}/hist-{}".format(self.file_name, col), 'w') as file:
@@ -293,6 +292,7 @@ class HistogramGenerator:
                     new_bin_value = bin_sum / len(hist)
                     avg_histogram[h][s][v] = new_bin_value
 
+        avg_histogram = _normalise_histogram(avg_histogram)
         if not os.path.exists("../histogram_data/{}/".format(self.file_name)):
             os.makedirs("../histogram_data/{}/".format(self.file_name))
         with open("../histogram_data/{}/hist-{}".format(self.file_name, col), 'w') as file:
@@ -304,6 +304,8 @@ class HistogramGenerator:
         if config.show_histograms:
             plt.imshow(avg_histogram)
             plt.title("HSV histogram for '{}'".format(self.file_name))
+            plt.xlabel("Hue")
+            plt.ylabel("Saturation")
             plt.show()
 
     def match_histograms(self, cur_all_model="all"):
