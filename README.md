@@ -11,6 +11,7 @@ where:
 * `--model` indicates the histogram model to use. Can be "all", "gray", "rgb" or "hsv". "all" will use the 3 histogram models to train/test the system.
 * `--mode` indicates the mode to run in. Can be "train" or "test".
 * `--debug` is an optional flag. If the flag is set, additional logs will be printed for debugging purposes.
+* `--showhists` is an optional flag. If the flag is set, all of the generated histograms will be displayed.
 
 Examples:
 
