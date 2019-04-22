@@ -1,4 +1,5 @@
 import os
+import sys
 
 import cv2
 import matplotlib.pyplot as plt
@@ -135,3 +136,43 @@ def get_video_fps(vc):
     :return: the video capture's FPS
     """
     return round(vc.get(cv2.CAP_PROP_FPS), 2)
+
+
+def terminal_yes_no_question(question, default="no"):
+    """
+    Ask a yes/no question via input() and return the answer as a boolean.
+    :param question: string that is presented in the terminal
+    :param default: presumed answer if <Enter> directly hit with no answer
+    :return: True for "yes" or False for "no"
+    """
+    valid = {"yes": True, "y": True, "no": False, "n": False}
+
+    if default is None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("invalid default answer: '%s'" % default)
+
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = input().lower()
+        if default is not None and choice == '':
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
+
+
+def video_file_already_stabilised(filepath):
+    """
+    Checks if the path to a stable version of the video already exists.
+    :param filepath: the path to the video
+    :return: True if it exists, False if it doesn't
+    """
+    if os.path.isfile(filepath):
+        return True
+    return False

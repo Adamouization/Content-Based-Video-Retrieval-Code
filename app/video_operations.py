@@ -105,6 +105,7 @@ class VideoStabilizer:
         """
         self.directory = directory
         self.file = file_name
+        self.new_file = file_name[:-4]
 
         self.stabilizer = VidStab()
         self.stabilize_video()
@@ -115,7 +116,7 @@ class VideoStabilizer:
         Stabilizes a mp4 video and outputs the result as an avi file in the same directory.
         :return:
         """
-        self.stabilizer.stabilize(input_path="{}/{}.mp4".format(self.directory, self.file),
-                                  output_path="{}/stable-{}.avi".format(self.directory, self.file),
+        self.stabilizer.stabilize(input_path="{}{}".format(self.directory, self.file),
+                                  output_path="{}/stable-{}.avi".format(self.directory, self.new_file),
                                   border_type="reflect")
         print("\nVideo stabilized!")

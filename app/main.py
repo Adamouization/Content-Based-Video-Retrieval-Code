@@ -4,10 +4,12 @@ import time
 
 from pyspin.spin import make_spin, Spin2
 
-from app.helpers import get_number_of_frames, get_video_filenames, get_video_fps, get_video_first_frame, \
-    print_finished_training_message, show_final_match
-from app.histogram import HistogramGenerator
 import app.config as config
+from app.helpers import display_results_histogram, get_number_of_frames, get_video_filenames, get_video_fps, \
+    get_video_first_frame, print_finished_training_message, terminal_yes_no_question, show_final_match, \
+    video_file_already_stabilised
+from app.histogram import HistogramGenerator
+from app.video_operations import VideoStabilizer
 
 
 def main():
@@ -86,10 +88,22 @@ def test_hist_classifier():
     :return: None
     """
     directory = "../recordings/"
-    recordings = ["recording1.mp4", "recording2.mp4", "recording3.mp4", "recording4.mp4"]
-    file = recordings[3]  # 0: cloudy-sky, 1: seal, 2: butterfly, 3: wind-turbine
+    recordings = ["recording1.mp4", "recording2.mp4", "recording3.mp4", "recording4.mp4", "recording5.mp4"]
+    file = recordings[2]  # 0: cloudy-sky, 1: seal, 2: butterfly (skewed), 3: wind-turbine, 4: butterfly
 
-    print("\nPlease crop the recorded video for the histogram to be generated.")
+    # ask user to stabilise the input query video or not
+    is_stabilise_video = terminal_yes_no_question("Do you wish to stabilise the recorded query video?")
+    # yes: stabilise the video and use the stable .avi version
+    if is_stabilise_video:
+        VideoStabilizer(directory, "{}".format(file))
+        file = "stable-" + file[:-4] + ".avi"
+    # no: check if a version of the stabilised video doesn't already exist - use it if it does
+    else:
+        temp_file = "stable-" + file[:-4] + ".avi"
+        if video_file_already_stabilised(directory + temp_file):
+            file = temp_file
+
+    print("\nPlease crop the recorded query video for the signature to be generated.")
 
     if config.model == "gray":
         histogram_generator = HistogramGenerator(directory, file)
