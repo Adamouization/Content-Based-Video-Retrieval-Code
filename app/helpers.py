@@ -104,6 +104,19 @@ def show_final_match(result_name, query_frame, result_frame, runtime, accuracy):
     plt.show()
 
 
+def display_results_histogram(results_dict):
+    """
+    Displays the results in the form of a histogram.
+    :param results_dict: the histogram with results and the number of matches per video
+    :return: None
+    """
+    plt.bar(list(results_dict.keys()), results_dict.values())
+    plt.title("Number of video matches made")
+    plt.xlabel("Videos")
+    plt.ylabel("Number of matches")
+    plt.show()
+
+
 def get_number_of_frames(vc):
     """
     Retrieves the total number of frames in a video using OpenCV's VideoCapture object cv2.CAP_PROP_FRAME_COUNT

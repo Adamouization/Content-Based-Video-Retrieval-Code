@@ -127,6 +127,7 @@ def test_hist_classifier():
         # combine matches from all 3 histogram models to output one final result
         all_results = histogram_generator_hsv.get_results_array()
         results_count = Counter(all_results)
+        display_results_histogram(results_count)
         print("Matches made: {}".format(results_count))
 
         # find best result
@@ -151,11 +152,11 @@ def test_hist_classifier():
 
 
 def segment_video():
-    # directory = "../recordings/"
-    # video = "scene-segmentation.mp4"
-    directory = "/Volumes/ADAM2/"
-    movies = ["Inception (2010).mp4"]
-    video = movies[0]
+    directory = "../recordings/"
+    video = "scene-segmentation.mp4"
+    # directory = "/Volumes/ADAM2/"
+    # movies = ["Inception (2010).mp4"]
+    # video = movies[0]
 
     shot_boundary_detector = HistogramGenerator(directory, video)
     video_capture = shot_boundary_detector.get_video_capture()
