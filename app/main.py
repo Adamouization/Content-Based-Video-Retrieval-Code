@@ -93,16 +93,18 @@ def test_hist_classifier():
 
     # ask user to stabilise the input query video or not
     is_stabilise_video = terminal_yes_no_question("Do you wish to stabilise the recorded query video?")
+    stable_filename = "stable-" + file[:-4] + ".avi"  # the stable version of the video
     # yes: stabilise the video and use the stable .avi version
     if is_stabilise_video:
-        VideoStabilizer(directory, "{}".format(file))
-        file = "stable-" + file[:-4] + ".avi"
+        if not video_file_already_stabilised(directory + stable_filename):
+            VideoStabilizer(directory, "{}".format(file))
+        file = stable_filename
     # no: check if a version of the stabilised video doesn't already exist - use it if it does
     else:
-        temp_file = "stable-" + file[:-4] + ".avi"
-        if video_file_already_stabilised(directory + temp_file):
-            file = temp_file
+        if video_file_already_stabilised(directory + stable_filename):
+            file = stable_filename
 
+    print("\nUsing query: '{}'".format(file))
     print("\nPlease crop the recorded query video for the signature to be generated.")
 
     if config.model == "gray":
