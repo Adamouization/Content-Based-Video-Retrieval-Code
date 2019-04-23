@@ -9,7 +9,7 @@ from app.helpers import display_results_histogram, get_number_of_frames, get_vid
     get_video_first_frame, print_finished_training_message, terminal_yes_no_question, show_final_match, \
     video_file_already_stabilised
 from app.histogram import HistogramGenerator
-from app.video_operations import VideoStabilizer
+from app.video_operations import VideoStabiliser
 
 
 def main():
@@ -89,7 +89,7 @@ def test_hist_classifier():
     """
     directory = "../recordings/"
     recordings = ["recording1.mp4", "recording2.mp4", "recording3.mp4", "recording4.mp4", "recording5.mp4"]
-    file = recordings[2]  # 0: cloudy-sky, 1: seal, 2: butterfly (skewed), 3: wind-turbine, 4: butterfly
+    file = recordings[4]  # 0: cloudy-sky, 1: seal, 2: butterfly (skewed), 3: wind-turbine, 4: butterfly
 
     # ask user to stabilise the input query video or not
     is_stabilise_video = terminal_yes_no_question("Do you wish to stabilise the recorded query video?")
@@ -97,7 +97,7 @@ def test_hist_classifier():
     # yes: stabilise the video and use the stable .avi version
     if is_stabilise_video:
         if not video_file_already_stabilised(directory + stable_filename):
-            VideoStabilizer(directory, "{}".format(file))
+            VideoStabiliser(directory, "{}".format(file))
         file = stable_filename
     # no: check if a version of the stabilised video doesn't already exist - use it if it does
     else:

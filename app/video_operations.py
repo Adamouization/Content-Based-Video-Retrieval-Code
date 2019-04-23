@@ -93,30 +93,30 @@ class ClickAndDrop:
         return self.reference_points
 
 
-class VideoStabilizer:
+class VideoStabiliser:
     """
-    Class used to stabilize the recorded video for more optimal matching.
+    Class used to stabilise the recorded video for more optimal matching.
     """
     def __init__(self, directory, file_name):
         """
-        Initialise variables and call the function to stabilize the specified video.
-        :param directory: the directory where the video file to stabilize is located
+        Initialise variables and call the function to stabilise the specified video.
+        :param directory: the directory where the video file to stabilise is located
         :param file_name: the mp4 video file's name
         """
         self.directory = directory
         self.file = file_name
         self.new_file = file_name[:-4]
 
-        self.stabilizer = VidStab()
-        self.stabilize_video()
+        self.stabiliser = VidStab()
+        self.stabilise_video()
 
-    @make_spin(Box1, "Stabilizing video...")
-    def stabilize_video(self):
+    @make_spin(Box1, "Stabilising video...")
+    def stabilise_video(self):
         """
-        Stabilizes a mp4 video and outputs the result as an avi file in the same directory.
+        Stabilises a mp4 video and outputs the result as an avi file in the same directory.
         :return:
         """
-        self.stabilizer.stabilize(input_path="{}{}".format(self.directory, self.file),
+        self.stabiliser.stabilize(input_path="{}{}".format(self.directory, self.file),
                                   output_path="{}/stable-{}.avi".format(self.directory, self.new_file),
                                   border_type="reflect")
-        print("\nVideo stabilized!")
+        print("\nVideo stabilised!")
