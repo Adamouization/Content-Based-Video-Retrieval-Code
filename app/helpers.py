@@ -111,11 +111,13 @@ def display_results_histogram(results_dict):
     :param results_dict: the histogram with results and the number of matches per video
     :return: None
     """
-    plt.bar(list(results_dict.keys()), results_dict.values())
-    plt.title("Number of video matches made")
-    plt.xlabel("Videos")
-    plt.ylabel("% of Matches")
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.bar(list(results_dict.keys()), results_dict.values())
+    plt.title("Probability of a match for most likely videos")
+    plt.ylabel("%")
     plt.tight_layout()
+    plt.setp(ax.get_xticklabels(), fontsize=10, rotation='vertical')
     plt.show()
 
 
