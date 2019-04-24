@@ -114,7 +114,8 @@ def display_results_histogram(results_dict):
     plt.bar(list(results_dict.keys()), results_dict.values())
     plt.title("Number of video matches made")
     plt.xlabel("Videos")
-    plt.ylabel("Number of matches")
+    plt.ylabel("% of Matches")
+    plt.tight_layout()
     plt.show()
 
 

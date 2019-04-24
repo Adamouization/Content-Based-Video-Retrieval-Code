@@ -140,11 +140,17 @@ def test_hist_classifier():
         histogram_generator_rgb.match_histograms(cur_all_model='rgb')
         histogram_generator_hsv.match_histograms(cur_all_model='hsv')
 
-        # combine matches from all 3 histogram models to output one final result
-        all_results = histogram_generator_hsv.get_results_array()
-        results_count = Counter(all_results)
-        display_results_histogram(results_count)
+        # Combine matches from all 3 histogram models to output one final result
+        all_results = histogram_generator_hsv.get_results_array()  # array of all matches made (using weights)
+        results_count = Counter(all_results)  # count the number of matches made for each video in all_results array
+        # transform from count to percentage of matches made
+        results_percentage = dict()
+        for match in results_count:
+            percentage = round((results_count[match] / len(all_results)) * 100.0, 2)
+            results_percentage[match] = percentage
+        display_results_histogram(results_percentage)
         print("Matches made: {}".format(results_count))
+        print("% of matches made: {}".format(results_percentage))
 
         # find best result
         final_result_name = ""
