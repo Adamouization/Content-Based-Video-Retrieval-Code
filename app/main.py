@@ -98,6 +98,7 @@ def test_hist_classifier():
     if is_stabilise_video:
         if not video_file_already_stabilised(directory + stable_filename):
             VideoStabiliser(directory, "{}".format(file))
+        print("\nStabilised version of query already found: '{}'".format(stable_filename))
         file = stable_filename
     # no: check if a version of the stabilised video doesn't already exist - use it if it does
     else:
