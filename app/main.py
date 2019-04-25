@@ -89,7 +89,7 @@ def test_hist_classifier():
     """
     directory = "../recordings/"
     recordings = ["recording1.mp4", "recording2.mp4", "recording3.mp4", "recording4.mp4", "recording5.mp4"]
-    file = recordings[4]  # 0: cloudy-sky, 1: seal, 2: butterfly (skewed), 3: wind-turbine, 4: butterfly
+    file = recordings[2]  # 0: cloudy-sky, 1: seal, 2: butterfly (skewed), 3: wind-turbine, 4: butterfly
 
     # ask user to stabilise the input query video or not
     is_stabilise_video = terminal_yes_no_question("Do you wish to stabilise the recorded query video?")
@@ -126,15 +126,14 @@ def test_hist_classifier():
         histogram_generator_gray = HistogramGenerator(directory, file)
         histogram_generator_gray.generate_video_greyscale_histogram(is_query=True)
         cur_reference_points = histogram_generator_gray.get_current_reference_points()
+        # start measuring runtime (after manual cropping)
+        start_time = time.time()
         # RGB
         histogram_generator_rgb = HistogramGenerator(directory, file)
         histogram_generator_rgb.generate_video_rgb_histogram(is_query=True, cur_ref_points=cur_reference_points)
         # HSV
         histogram_generator_hsv = HistogramGenerator(directory, file)
         histogram_generator_hsv.generate_video_hsv_histogram(is_query=True, cur_ref_points=cur_reference_points)
-
-        # start measuring runtime
-        start_time = time.time()
 
         # calculate distances between query and DB histograms
         histogram_generator_gray.match_histograms(cur_all_model='gray')
