@@ -45,7 +45,8 @@ cd Content-Based-Video-Retrieval-Code
 ## TODO Project Boards
 
 * [Project Presentation](https://github.com/Adamouization/Content-Based-Video-Retrieval-Code/projects/1) (18/02/2019)
-* [Project Enhancements](https://github.com/Adamouization/Content-Based-Video-Retrieval-Code/projects/2) (07/05/2019)
+* [Project Final Code](https://github.com/Adamouization/Content-Based-Video-Retrieval-Code/projects/2) (07/05/2019)
+* [Project Future Improvements](https://github.com/Adamouization/Content-Based-Video-Retrieval-Code/projects/3) (post hand-in)
 
 ## License
 
