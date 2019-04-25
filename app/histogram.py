@@ -15,8 +15,7 @@ from app.video_operations import ClickAndDrop
 class HistogramGenerator:
     colours = ('b', 'g', 'r')
     bins = (8, 12, 3)  # 8 hue bins, 12 saturation bins, 3 value bins
-    histcmp_methods = [cv2.HISTCMP_CORREL, cv2.HISTCMP_CHISQR, cv2.HISTCMP_INTERSECT, cv2.HISTCMP_BHATTACHARYYA,
-                       cv2.HISTCMP_CHISQR_ALT, cv2.HISTCMP_KL_DIV]
+    histcmp_methods = [cv2.HISTCMP_CORREL, cv2.HISTCMP_CHISQR, cv2.HISTCMP_INTERSECT, cv2.HISTCMP_HELLINGER]
     histcmp_3d_methods = ["wasserstein_distance", "energy_distance"]
     histogram_comparison_weigths = {  # weights per comparison methods
         'gray': 1,
@@ -364,10 +363,6 @@ class HistogramGenerator:
                     method = "INTERSECTION"
                 elif m == 3:
                     method = "HELLINGER"
-                elif m == 4:
-                    method = "ALTERNATIVE CHI-SQUARE"
-                elif m == 5:
-                    method = "KULLBACK-LEIBLER DIVERGENCE"
 
                 # CSV file to write data to for each method
                 if config.model == "all":
