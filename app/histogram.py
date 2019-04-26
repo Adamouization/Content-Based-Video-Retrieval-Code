@@ -16,7 +16,7 @@ class HistogramGenerator:
     colours = ('b', 'g', 'r')
     bins = (8, 12, 3)  # 8 hue bins, 12 saturation bins, 3 value bins
     histcmp_methods = [cv2.HISTCMP_CORREL, cv2.HISTCMP_CHISQR, cv2.HISTCMP_INTERSECT, cv2.HISTCMP_HELLINGER]
-    histcmp_3d_methods = ["wasserstein_distance", "energy_distance"]
+    histcmp_3d_methods = ["earths_mover_distance", "energy_distance"]
     histogram_comparison_weigths = {  # weights per comparison methods
         'gray': 1,
         'rgb': 5,
@@ -423,8 +423,8 @@ class HistogramGenerator:
         # use SciPy's statistical distances functions for HSV histograms (compareHist does not work with 3d arrays)
         elif config.model == "hsv" or config.model == "all":
             for m in self.histcmp_3d_methods:
-                if m == "wasserstein_distance":
-                    method = "WASSERSTEIN DISTANCE (EMD)"
+                if m == "earths_mover_distance":
+                    method = "EARTH'S MOVER DISTANCE"
                 elif m == "energy_distance":
                     method = "ENERGY DISTANCE"
 
@@ -447,7 +447,7 @@ class HistogramGenerator:
                             for s in range(0, self.bins[1]):  # loop through saturation bins
                                 query_histogram_slice = query_histogram['hsv'][h][s]
                                 dbvideo_histogram_slice = dbvideo_hsv_histogram[h][s]
-                                if method == "WASSERSTEIN DISTANCE (EMD)":
+                                if method == "EARTH'S MOVER DISTANCE":
                                     comparison += wasserstein_distance(query_histogram_slice, dbvideo_histogram_slice)
                                 elif method == "ENERGY DISTANCE":
                                     comparison += energy_distance(query_histogram_slice, dbvideo_histogram_slice)
@@ -541,7 +541,7 @@ class HistogramGenerator:
 
         # Plot results
         plt.plot(x_axis, y_axis)
-        plt.plot(x_axis, np.full(frame_counter, 10))
+        plt.plot(x_axis, np.full(frame_counter, threshold))
         plt.title("Kullback-Leibler Divergence Between Consecutive Frame RGB Histogram")
         plt.xlabel("Frame")
         plt.ylabel("KL Divergence")

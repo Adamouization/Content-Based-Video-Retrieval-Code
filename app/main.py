@@ -38,9 +38,9 @@ def main():
     config.model = args.model
 
     if config.mode == "train":
-        train_hist_classifier()
+        off_line_colour_based_feature_extraction_phase()
     elif config.mode == "test":
-        test_hist_classifier()
+        on_line_retrieval_phase()
     elif config.mode == "segment":
         segment_video()
     else:
@@ -48,10 +48,10 @@ def main():
         exit(0)
 
 
-@make_spin(Spin2, "Generating histograms...".format(config.model))
-def train_hist_classifier():
+@make_spin(Spin2, "Generating histograms for database videos...".format(config.model))
+def off_line_colour_based_feature_extraction_phase():
     """
-    Generates an averaged BGR histogram for all the videos in the directory-based database.
+    Generates and stores averaged greyscale, RGB and HSV histograms for all the videos in the directory-based database.
     :return: None
     """
     directory = "../footage/"
@@ -81,10 +81,10 @@ def train_hist_classifier():
     print_finished_training_message(config.model, directory, runtime)
 
 
-def test_hist_classifier():
+def on_line_retrieval_phase():
     """
-    Prompts the user to crop the recorded video before generating an averaged BGR histogram and comparing it with the
-    other averaged histograms for matching.
+    Prompts the user to stabilise and crop the query video before generating the same averaged greyscale, RGB and HSV
+    histograms to compare with the database videos' previously stored histograms using distance metrics.
     :return: None
     """
     directory = "../recordings/"
@@ -196,7 +196,7 @@ def segment_video():
 
     # start processing video for shout boundary detection
     print("Starting to process video for shot boundary detection...")
-    shot_boundary_detector.rgb_histogram_shot_boundary_detection(threshold=10)
+    shot_boundary_detector.rgb_histogram_shot_boundary_detection(threshold=7)
 
     # print final results
     runtime = round(time.time() - start_time, 2)
