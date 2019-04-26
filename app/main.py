@@ -174,6 +174,10 @@ def test_hist_classifier():
 
 
 def segment_video():
+    """
+    Applies a shot boundary detection algorithm to a video for segmentation.
+    :return: None
+    """
     directory = "../recordings/"
     video = "scene-segmentation.mp4"
     # directory = "/Volumes/ADAM2/"
