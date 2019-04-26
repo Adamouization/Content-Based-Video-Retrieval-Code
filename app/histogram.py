@@ -476,9 +476,8 @@ class HistogramGenerator:
 
     def rgb_histogram_shot_boundary_detection(self, threshold):
         """
-        Compares consecutive frames' RGB histograms using the Kullback-Leibler Divergence metric using a global
-        threshold approach. If the metric is bigger than the specified threshold, then a shot boundary has been
-        detected.
+        Compares consecutive frames' RGB histograms using the Intersection metric with a global threshold approach.
+        If the metric is smaller than the specified threshold, then a shot boundary has been detected.
         :param threshold: integer specifying the global threshold for the algorithm
         :return: None
         """
@@ -519,21 +518,22 @@ class HistogramGenerator:
                     cur_rgb_hist[col].append(cur_frame_hist)
                     prev_rgb_hist[col].append(prev_frame_hist)
 
-                # calculate Kullback-Leibler Divergence between consecutive frames
-                comparison_r = cv2.compareHist(prev_rgb_hist['r'][0], cur_rgb_hist['r'][0], cv2.HISTCMP_KL_DIV)
-                comparison_g = cv2.compareHist(prev_rgb_hist['g'][0], cur_rgb_hist['g'][0], cv2.HISTCMP_KL_DIV)
-                comparison_b = cv2.compareHist(prev_rgb_hist['b'][0], cur_rgb_hist['b'][0], cv2.HISTCMP_KL_DIV)
+                # calculate Intersection between consecutive frames
+                comparison_r = cv2.compareHist(prev_rgb_hist['r'][0], cur_rgb_hist['r'][0], cv2.HISTCMP_INTERSECT)
+                comparison_g = cv2.compareHist(prev_rgb_hist['g'][0], cur_rgb_hist['g'][0], cv2.HISTCMP_INTERSECT)
+                comparison_b = cv2.compareHist(prev_rgb_hist['b'][0], cur_rgb_hist['b'][0], cv2.HISTCMP_INTERSECT)
                 comparison = (comparison_b + comparison_g + comparison_r) / 3
+                # For KL Divergence, use cv2.HISTCMP_KL_DIV
 
                 # append data to lists for plot
                 x_axis.append(frame_counter)
                 y_axis.append(comparison)
 
-                if comparison > threshold and is_under_threshold:
+                if comparison < threshold and is_under_threshold:
                     scene_change_counter += 1
                     is_under_threshold = False
                     print("Scene Change detected at Frame {}".format(frame_counter))
-                elif comparison < threshold:
+                elif comparison > threshold:
                     is_under_threshold = True
 
             else:
@@ -542,9 +542,9 @@ class HistogramGenerator:
         # Plot results
         plt.plot(x_axis, y_axis)
         plt.plot(x_axis, np.full(frame_counter, threshold))
-        plt.title("Kullback-Leibler Divergence Between Consecutive Frame RGB Histogram")
+        plt.title("Intersection Between Consecutive Frame RGB Histogram")
         plt.xlabel("Frame")
-        plt.ylabel("KL Divergence")
+        plt.ylabel("Intersection")
         plt.show()
         print("\n--- Number of shot changes detected: {} ---".format(scene_change_counter))
 
