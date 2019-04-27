@@ -1,24 +1,21 @@
 # Content-Based-Video-Retrieval-Code
 
-## Usage
+TODO: include abstract here
+
+## Project Structure
 
 ```
-python app/main.py --model <model> --mode <mode> (--debug)
+.
+├── app                     // source root
+│   ├── main.py             // program entry point, parses console arguments
+│   ├── histogram.py        // generates, averages and stores histograms
+│   ├── video_operations.py // query video operations
+│   ├── helpers.py          // general helper functions
+│   └── config.py           // global variables
+├── footage             // database videos
+├── recordings          // query videos
+└── requirements.txt    // pip installation file
 ```
-
-where:
-
-* `--model` indicates the histogram model to use. Can be "all", "gray", "rgb" or "hsv". "all" will use the 3 histogram models to train/test the system.
-* `--mode` indicates the mode to run in. Can be "train" or "test".
-* `--debug` is an optional flag. If the flag is set, additional logs will be printed for debugging purposes.
-* `--showhists` is an optional flag. If the flag is set, all of the generated histograms will be displayed.
-
-Examples:
-
-* To train the system: `python app/main.py --model all --mode test`
-* To test the system: `python app/main.py --model all --mode train`
-* To train the system with RGB only: `python app/main.py --model rgb --mode train`
-* To test the system with HSV only in debug mode: `python app/main.py --model hsv --mode test --debug`
 
 ## Installation
 
@@ -41,6 +38,25 @@ cd Content-Based-Video-Retrieval-Code
 
 `pip install -r requirements.txt`
 
+## Usage
+
+```
+python app/main.py --model <model> --mode <mode> (--debug)
+```
+
+where:
+
+* `--model` indicates the histogram model to use. Can be "all", "gray", "rgb" or "hsv". "all" will use the 3 histogram models to train/test the system.
+* `--mode` indicates the mode to run in. Can be "train" or "test".
+* `--debug` is an optional flag. If the flag is set, additional logs will be printed for debugging purposes.
+* `--showhists` is an optional flag. If the flag is set, all of the generated histograms will be displayed.
+
+Examples:
+
+* To train the system: `python app/main.py --model all --mode test`
+* To test the system: `python app/main.py --model all --mode train`
+* To train the system with RGB only: `python app/main.py --model rgb --mode train`
+* To test the system with HSV only in debug mode: `python app/main.py --model hsv --mode test --debug`
 
 ## TODO Project Boards
 
