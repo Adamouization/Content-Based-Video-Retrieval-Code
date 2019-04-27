@@ -14,7 +14,7 @@ from app.video_operations import VideoStabiliser
 
 def main():
     """
-    Program entry point. Parses command line input.
+    Program entry point. Parses command line input to decide which phase of the system to run.
     :return: None
     """
     parser = argparse.ArgumentParser()
@@ -42,7 +42,7 @@ def main():
     elif config.mode == "test":
         on_line_retrieval_phase()
     elif config.mode == "segment":
-        segment_video()
+        database_preprocessing_phase()
     else:
         print("Wrong mode chosen. Choose from the following options: 'train', 'test' or 'segment'.")
         exit(0)
@@ -122,7 +122,7 @@ def on_line_retrieval_phase():
         histogram_generator.match_histograms()
     else:
         # calculate query histogram
-        # gray scale
+        # greyscale
         histogram_generator_gray = HistogramGenerator(directory, file)
         histogram_generator_gray.generate_video_greyscale_histogram(is_query=True)
         cur_reference_points = histogram_generator_gray.get_current_reference_points()
@@ -173,7 +173,7 @@ def on_line_retrieval_phase():
         print_finished_training_message(final_result_name, config.model, runtime, accuracy)
 
 
-def segment_video():
+def database_preprocessing_phase():
     """
     Applies a shot boundary detection algorithm to a video for segmentation.
     :return: None

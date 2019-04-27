@@ -13,7 +13,7 @@ from app.video_operations import ClickAndDrop
 
 
 class HistogramGenerator:
-    colours = ('b', 'g', 'r')
+    colours = ('b', 'g', 'r')  # RGB channels
     bins = (8, 12, 3)  # 8 hue bins, 12 saturation bins, 3 value bins
     histcmp_methods = [cv2.HISTCMP_CORREL, cv2.HISTCMP_CHISQR, cv2.HISTCMP_INTERSECT, cv2.HISTCMP_HELLINGER]
     histcmp_3d_methods = ["earths_mover_distance", "energy_distance"]
@@ -51,7 +51,7 @@ class HistogramGenerator:
 
     def generate_video_rgb_histogram(self, is_query=False, cur_ref_points=None):
         """
-        Generates multiple normalised histograms (one every second) for a video.
+        Generates multiple RGB histograms (one every second) for a video.
         :param is_query: boolean specifying if the input video is the query video (to select ROI)
         :param cur_ref_points: list of previously-used ROI point locations
         :return: None
@@ -101,7 +101,7 @@ class HistogramGenerator:
 
     def generate_video_greyscale_histogram(self, is_query=False):
         """
-        Generates multiple normalised greyscale histograms (one every second) for a video.
+        Generates multiple greyscale histograms (one every second) for a video.
         :param is_query: boolean specifying if the input video is the query video (to select ROI)
         :return: None
         """
@@ -149,7 +149,7 @@ class HistogramGenerator:
 
     def generate_video_hsv_histogram(self, is_query=False, cur_ref_points=None):
         """
-        Generates multiple normalised HSV histograms (one every second) for a video.
+        Generates multiple HSV histograms (one every second) for a video.
         :param is_query: boolean specifying if the input video is the query video (to select ROI)
         :param cur_ref_points: list of previously-used ROI point locations
         :return: None
@@ -198,8 +198,8 @@ class HistogramGenerator:
 
     def generate_and_store_average_rgb_histogram(self):
         """
-        Generates a single BGR histogram by averaging all histograms of a video before writing the results to a txt
-        file.
+        Generates a single RGB histogram by averaging all histograms of a video before normalising it and saving the
+        results to a plain text file.
         :return: None
         """
         avg_histogram = np.zeros(shape=(255, 1))  # array to store average histogram values
@@ -216,7 +216,10 @@ class HistogramGenerator:
                 new_bin_value = bin_sum / len(hists)
                 avg_histogram[i] = new_bin_value
 
+            # normalise averaged histogram
             avg_histogram = _normalise_histogram(avg_histogram)
+
+            # write to file
             if not os.path.exists("../histogram_data/{}/".format(self.file_name)):
                 os.makedirs("../histogram_data/{}/".format(self.file_name))
             with open("../histogram_data/{}/hist-{}".format(self.file_name, col), 'w') as file:
@@ -235,8 +238,8 @@ class HistogramGenerator:
 
     def generate_and_store_average_greyscale_histogram(self):
         """
-        Generates a single BGR histogram by averaging all histograms of a video before writing the results to a txt
-        file.
+        Generates a single greyscale histogram by averaging all histograms of a video before normalising it and saving
+        the results to a plain text file.
         :return: None
         """
         avg_histogram = np.zeros(shape=(255, 1))  # array to store average histogram values
@@ -256,7 +259,10 @@ class HistogramGenerator:
             new_bin_value = bin_sum / len(hist)
             avg_histogram[i] = new_bin_value
 
+        # normalise averaged histogram
         avg_histogram = _normalise_histogram(avg_histogram)
+
+        # write to file
         if not os.path.exists("../histogram_data/{}/".format(self.file_name)):
             os.makedirs("../histogram_data/{}/".format(self.file_name))
         with open("../histogram_data/{}/hist-{}".format(self.file_name, col), 'w') as file:
@@ -271,8 +277,8 @@ class HistogramGenerator:
 
     def generate_and_store_average_hsv_histogram(self):
         """
-        Generates a single BGR histogram by averaging all histograms of a video before writing the results to a txt
-        file.
+        Generates a single HSV histogram by averaging all histograms of a video before normalising it and saving the
+        results to a plain text file.
         :return: None
         """
         avg_histogram = np.zeros(shape=(8, 12, 3))  # array to store average histogram values
@@ -294,7 +300,10 @@ class HistogramGenerator:
                     new_bin_value = bin_sum / len(hist)
                     avg_histogram[h][s][v] = new_bin_value
 
+        # normalise averaged histogram
         avg_histogram = _normalise_histogram(avg_histogram)
+
+        # write to file
         if not os.path.exists("../histogram_data/{}/".format(self.file_name)):
             os.makedirs("../histogram_data/{}/".format(self.file_name))
         with open("../histogram_data/{}/hist-{}".format(self.file_name, col), 'w') as file:
@@ -312,9 +321,11 @@ class HistogramGenerator:
 
     def match_histograms(self, cur_all_model="all"):
         """
-        Compares the BGR histogram of the recorded video and compares it with each of the saved average BGR histograms
-        using different histogram matching methods such as the Chi-Square or Hellinger methods, and prints the
-        results as probabilities in a CLI table and writes the data to a CSV file.
+        Compares the greyscale, RGB and HSV histograms of the query video with each of the saved average histograms
+        using different distance metrics such as the Correlation, Intersection, Chi-Square Distance, Hellinger Distance,
+        Earth's Mover Distance and Energy Distance metrics. Finally, prints the results for each histogram model and
+        metric in a console table and writes the data to a CSV file.
+        :param cur_all_model: the current histogram model when operating with all 3 models
         :return: None
         """
         # variables used for finding the match to the recorded video
@@ -488,7 +499,7 @@ class HistogramGenerator:
         ret, frame = self.video_capture.read()  # get initial frame
 
         frame_counter = 0  # keep track of current frame ID to locate shot boundaries
-        scene_change_counter = 0  # keep track of the number of shot changes detected
+        shot_changes_detected = 0  # keep track of the number of shot changes detected
         while self.video_capture.isOpened():
             prev_frame = frame[:]  # previous frame
             ret, frame = self.video_capture.read()  # read capture frame by frame
@@ -530,7 +541,7 @@ class HistogramGenerator:
                 y_axis.append(comparison)
 
                 if comparison < threshold and is_under_threshold:
-                    scene_change_counter += 1
+                    shot_changes_detected += 1
                     is_under_threshold = False
                     print("Scene Change detected at Frame {}".format(frame_counter))
                 elif comparison > threshold:
@@ -546,7 +557,7 @@ class HistogramGenerator:
         plt.xlabel("Frame")
         plt.ylabel("Intersection")
         plt.show()
-        print("\n--- Number of shot changes detected: {} ---".format(scene_change_counter))
+        print("\n--- Number of shot changes detected: {} ---".format(shot_changes_detected))
 
         self.destroy_video_capture()
 
@@ -560,7 +571,7 @@ class HistogramGenerator:
 
     def destroy_video_capture(self):
         """
-        Tidying up the OpenCV environment and the video capture
+        Tidying up the OpenCV environment and the video capture.
         :return: None
         """
         self.video_capture.release()
@@ -590,7 +601,7 @@ class HistogramGenerator:
 
 def _normalise_histogram(hist):
     """
-    Normalise a histogram using OpenCV's "normalise: function
+    Normalise a histogram using OpenCV's "normalize" function.
     :param hist: the histogram to normalise
     :return: the normalised histogram
     """
@@ -600,7 +611,7 @@ def _normalise_histogram(hist):
 
 def _get_frames_to_process(vc):
     """
-    Returns the IDs of the frames to calculate a BGR histogram for.
+    Returns the IDs of the frames to calculate a histogram for. 1 Frame Per Second.
     :param vc: the VideoCapture object to process
     :return: a list of integers representing the frames to process
     """

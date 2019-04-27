@@ -52,9 +52,6 @@ class ClickAndDrop:
 
         NOTE: must crop from top-left corner to bottom-right corner
 
-        Function written by Adrian Rosebrock
-        Link: https://www.pyimagesearch.com/2015/03/09/capturing-mouse-click-events-with-python-and-opencv/
-
         :param event: one of the MouseEventTypes constants
         :param x: the x-coordinate of the mouse event
         :param y: the y-coordinate of the mouse event
