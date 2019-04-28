@@ -222,7 +222,7 @@ class HistogramGenerator:
             # write to file
             if not os.path.exists("../histogram_data/{}/".format(self.file_name)):
                 os.makedirs("../histogram_data/{}/".format(self.file_name))
-            with open("../histogram_data/{}/hist-{}".format(self.file_name, col), 'w') as file:
+            with open("../histogram_data/{}/hist-{}.txt".format(self.file_name, col), 'w') as file:
                 file.write("# '{}' channel of RGB histogram ({} bins) [normalised]\n".format(
                     col.upper(),
                     avg_histogram.shape[0]
@@ -265,7 +265,7 @@ class HistogramGenerator:
         # write to file
         if not os.path.exists("../histogram_data/{}/".format(self.file_name)):
             os.makedirs("../histogram_data/{}/".format(self.file_name))
-        with open("../histogram_data/{}/hist-{}".format(self.file_name, col), 'w') as file:
+        with open("../histogram_data/{}/hist-{}.txt".format(self.file_name, col), 'w') as file:
             file.write("# Greyscale Histogram ({} bins) [normalised]\n".format(avg_histogram.shape[0]))
             np.savetxt(file, avg_histogram, fmt='%f')
         if config.show_histograms:
@@ -306,7 +306,7 @@ class HistogramGenerator:
         # write to file
         if not os.path.exists("../histogram_data/{}/".format(self.file_name)):
             os.makedirs("../histogram_data/{}/".format(self.file_name))
-        with open("../histogram_data/{}/hist-{}".format(self.file_name, col), 'w') as file:
+        with open("../histogram_data/{}/hist-{}.txt".format(self.file_name, col), 'w') as file:
             file.write("# HSV Histogram shape: {0} [normalised]\n".format(avg_histogram.shape))
             for arr_2d in avg_histogram:
                 file.write("# New slice\n")
@@ -337,19 +337,19 @@ class HistogramGenerator:
         if config.model == "gray" or (cur_all_model == "gray" and config.model == "all"):
             query_histogram = {
                 'gray': np.loadtxt(
-                    "../histogram_data/{}/hist-gray".format(self.file_name),
+                    "../histogram_data/{}/hist-gray.txt".format(self.file_name),
                     dtype=np.float32,
                     unpack=False
                 ),
             }
         elif config.model == "rgb" or (cur_all_model == "rgb" and config.model == "all"):
             query_histogram = {
-                'b': np.loadtxt("../histogram_data/{}/hist-b".format(self.file_name), dtype=np.float32, unpack=False),
-                'g': np.loadtxt("../histogram_data/{}/hist-g".format(self.file_name), dtype=np.float32, unpack=False),
-                'r': np.loadtxt("../histogram_data/{}/hist-r".format(self.file_name), dtype=np.float32, unpack=False)
+                'b': np.loadtxt("../histogram_data/{}/hist-b.txt".format(self.file_name), dtype=np.float32, unpack=False),
+                'g': np.loadtxt("../histogram_data/{}/hist-g.txt".format(self.file_name), dtype=np.float32, unpack=False),
+                'r': np.loadtxt("../histogram_data/{}/hist-r.txt".format(self.file_name), dtype=np.float32, unpack=False)
             }
         elif config.model == "hsv" or (cur_all_model == "hsv" and config.model == "all"):
-            hsv_data = np.loadtxt("../histogram_data/{}/hist-hsv".format(self.file_name))
+            hsv_data = np.loadtxt("../histogram_data/{}/hist-hsv.txt".format(self.file_name))
             query_histogram = {
                 'hsv': hsv_data.reshape((8, 12, 3))
             }
@@ -388,12 +388,12 @@ class HistogramGenerator:
                     for i, file in enumerate(get_video_filenames("../footage/")):
                         comparison = 0
                         if config.model == "gray" or (cur_all_model == "gray" and config.model == "all"):
-                            dbvideo_greyscale_histogram = np.loadtxt("../histogram_data/{}/hist-gray".format(file), dtype=np.float32, unpack=False)
+                            dbvideo_greyscale_histogram = np.loadtxt("../histogram_data/{}/hist-gray.txt".format(file), dtype=np.float32, unpack=False)
                             comparison = cv2.compareHist(query_histogram['gray'], dbvideo_greyscale_histogram, m)
                         elif config.model == "rgb" or (cur_all_model == "rgb" and config.model == "all"):
-                            dbvideo_b_histogram = np.loadtxt("../histogram_data/{}/hist-b".format(file), dtype=np.float32, unpack=False)
-                            dbvideo_g_histogram = np.loadtxt("../histogram_data/{}/hist-g".format(file), dtype=np.float32, unpack=False)
-                            dbvideo_r_histogram = np.loadtxt("../histogram_data/{}/hist-r".format(file), dtype=np.float32, unpack=False)
+                            dbvideo_b_histogram = np.loadtxt("../histogram_data/{}/hist-b.txt".format(file), dtype=np.float32, unpack=False)
+                            dbvideo_g_histogram = np.loadtxt("../histogram_data/{}/hist-g.txt".format(file), dtype=np.float32, unpack=False)
+                            dbvideo_r_histogram = np.loadtxt("../histogram_data/{}/hist-r.txt".format(file), dtype=np.float32, unpack=False)
                             comparison_b = cv2.compareHist(query_histogram['b'], dbvideo_b_histogram, m)
                             comparison_g = cv2.compareHist(query_histogram['g'], dbvideo_g_histogram, m)
                             comparison_r = cv2.compareHist(query_histogram['r'], dbvideo_r_histogram, m)
@@ -451,7 +451,7 @@ class HistogramGenerator:
 
                     table_data = list()
                     for i, file in enumerate(get_video_filenames("../footage/")):
-                        dbvideo_hsv_histogram_data = np.loadtxt("../histogram_data/{}/hist-hsv".format(file))
+                        dbvideo_hsv_histogram_data = np.loadtxt("../histogram_data/{}/hist-hsv.txt".format(file))
                         dbvideo_hsv_histogram = dbvideo_hsv_histogram_data.reshape((8, 12, 3))
                         comparison = 0
                         for h in range(0, self.bins[0]):  # loop through hue bins
