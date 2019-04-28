@@ -88,8 +88,9 @@ def on_line_retrieval_phase():
     :return: None
     """
     directory = "../recordings/"
-    recordings = ["recording1.mp4", "recording2.mp4", "recording3.mp4", "recording4.mp4", "recording5.mp4"]
-    file = recordings[2]  # 0: cloudy-sky, 1: seal, 2: butterfly (skewed), 3: wind-turbine, 4: butterfly
+    recordings = ["recording1.mp4", "recording2.mp4", "recording3.mp4", "recording4.mp4", "recording5.mp4",
+                  "recording6.mp4"]
+    file = recordings[5]  # 0: cloudy-sky, 1: seal, 2: butterfly (skewed), 3: wind-turbine, 4: ice-hockey, 5: jellyfish
 
     # ask user to stabilise the input query video or not
     is_stabilise_video = terminal_yes_no_question("Do you wish to stabilise the recorded query video?")
