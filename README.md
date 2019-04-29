@@ -42,22 +42,23 @@ cd Content-Based-Video-Retrieval-Code
 ## Usage
 
 ```
-python app/main.py --model <model> --mode <mode> (--debug)
+python app/main.py --model <model> --mode <mode> (--showhists) (--debug)
 ```
 
 where:
 
-* `--model` indicates the histogram model to use. Can be "all", "gray", "rgb" or "hsv". "all" will use the 3 histogram models to train/test the system.
-* `--mode` indicates the mode to run in. Can be "train" or "test".
-* `--debug` is an optional flag. If the flag is set, additional logs will be printed for debugging purposes.
+* `--model` indicates the histogram model to use. Can be "all", "gray", "rgb" or "hsv". The "all" option will use the 3 histogram models to train/test the system.
+* `--mode` indicates the mode to run in. Can be "train", "test" or "segment".
 * `--showhists` is an optional flag. If the flag is set, all of the generated histograms will be displayed.
+* `--debug` is an optional flag. If the flag is set, additional logs will be printed for debugging purposes.
 
 Examples:
 
-* To train the system: `python app/main.py --model all --mode test`
-* To test the system: `python app/main.py --model all --mode train`
+* To train the system and hide generated histograms: `python app/main.py --model all --mode test`
+* To test the system and display generated histograms: `python app/main.py --model all --mode train --showhists`
 * To train the system with RGB only: `python app/main.py --model rgb --mode train`
 * To test the system with HSV only in debug mode: `python app/main.py --model hsv --mode test --debug`
+* To segment a video using shot boundary detection: `python app/main.py --mode segment`
 
 ## TODO Project Boards
 
