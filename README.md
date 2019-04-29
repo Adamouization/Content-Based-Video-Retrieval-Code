@@ -6,7 +6,7 @@ TODO: include abstract here
 
 ```
 .
-├── app                     // source root
+├── app                 // source root
 │   ├── main.py             // program entry point, parses console arguments
 │   ├── histogram.py        // generates, averages and stores histograms
 │   ├── video_operations.py // query video operations
@@ -14,6 +14,7 @@ TODO: include abstract here
 │   └── config.py           // global variables
 ├── footage             // database videos
 ├── recordings          // query videos
+├── results             // figures, plots and csv files depicting results
 └── requirements.txt    // pip installation file
 ```
 
