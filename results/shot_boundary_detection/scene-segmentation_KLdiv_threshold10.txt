@@ -1,0 +1,14 @@
+/Users/ajaamour/Environments/Content-Based-Video-Retrieval-Code/bin/python3 /Users/ajaamour/Projects/Content-Based-Video-Retrieval-Code/app/main.py --mode segment
+Total Frames: 350
+FPS: 29.97
+
+Starting to process video for shot boundary detection...
+Scene Change detected at Frame 73
+Scene Change detected at Frame 261
+Scene Change detected at Frame 277
+
+--- Number of shot changes detected: 3 ---
+--- Number of frames in video: 350 ---
+--- Runtime: 1.64 seconds ---
+
+Process finished with exit code 0
