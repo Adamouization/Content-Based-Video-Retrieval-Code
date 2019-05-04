@@ -340,7 +340,7 @@ class HistogramGenerator:
                     "../histogram_data/{}/hist-gray.txt".format(self.file_name),
                     dtype=np.float32,
                     unpack=False
-                ),
+                )
             }
         elif config.model == "rgb" or (cur_all_model == "rgb" and config.model == "all"):
             query_histogram = {
@@ -354,7 +354,7 @@ class HistogramGenerator:
                 'hsv': hsv_data.reshape((8, 12, 3))
             }
 
-        # compare recorded video histogram with histogram of each video
+        # compare query histogram with each DB video histogram
         print("\n{} Histogram Comparison Results:\n".format(_get_chosen_model_string(cur_all_model)))
 
         method = ""

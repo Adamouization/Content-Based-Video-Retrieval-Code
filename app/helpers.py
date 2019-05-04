@@ -16,7 +16,7 @@ def get_video_filenames(directory):
     list_of_videos = list()
     for filename in os.listdir(directory):
         if filename == ".DS_Store":
-            pass  # ignoring .DS_Store file
+            pass  # ignoring .DS_Store file (for macOS)
         elif filename.endswith(".mp4"):
             list_of_videos.append(filename)
         else:
