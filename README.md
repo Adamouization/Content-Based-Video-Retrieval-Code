@@ -1,4 +1,4 @@
-# Content Based Video Retrieval for Pattern Matching Video Clips (Code)
+# Content Based Video Retrieval for Pattern Matching Video Clips (Code) [![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause) ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 
 The latex report of this dissertation can be found online at the following URL: [https://github.com/Adamouization/Content-Based-Video-Retrieval-Dissertation](https://github.com/Adamouization/Content-Based-Video-Retrieval-Dissertation)
 
@@ -78,8 +78,22 @@ Examples:
 
 * see [LICENSE](https://github.com/Adamouization/Content-Based-Video-Retrieval-Code/blob/master/LICENSE) file
 
+## Citation
+
+Jaamour, A. (2019). Content-Based-Video-Retrieval-Code [Computer software]. https://github.com/Adamouization/Content-Based-Video-Retrieval-Code
+
+```
+@software{Jaamour_Content-Based-Video-Retrieval-Code_2019,
+  author = {Jaamour, Adam},
+  license = {BSD-2-Clause},
+  month = jul,
+  title = {{Content-Based-Video-Retrieval-Code}},
+  url = {https://github.com/Adamouization/Content-Based-Video-Retrieval-Code},
+  year = {2019}
+}
+```
+
 ## Contact
-* email: adam@jaamour.com
+* email: adam[at]jaamour[dot]com
 * LinkedIn: [www.linkedin.com/in/adamjaamour](https://www.linkedin.com/in/adamjaamour/)
 * website: www.adam.jaamour.com
-* twitter: [@Adamouization](https://twitter.com/Adamouization)
